@@ -98,6 +98,6 @@ struct BreedsView: View {
     }
 }
 
-//#Preview {
-//    BreedsView()
-//}
+#Preview {
+    BreedsView(viewModel: BreedsViewModel())
+}
