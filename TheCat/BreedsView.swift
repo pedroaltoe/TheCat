@@ -37,8 +37,9 @@ struct BreedsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .font(.body)
+                .accessibilityLabel(A11y.Breeds.refreshButton)
+                .accessibilityIdentifier("Refresh button")
             }
-            
         case .loadingMore:
             progressView
         }
@@ -57,19 +58,27 @@ struct BreedsView: View {
                     VStack(spacing: Space.small) {
                         ZStack(alignment: .topTrailing) {
                             breedImage(breed)
+                                .accessibilityLabel(A11y.Breeds.image)
+                                .accessibilityIdentifier("Cat breed image")
                             
                             if breed.isFavorite == true {
                                 Image(systemName: Constants.Image.favorite)
                                     .renderingMode(.original)
+                                    .accessibilityLabel(A11y.Breeds.favorite)
+                                    .accessibilityIdentifier("Cat breed favorite")
                             }
                         }
                         
                         Text(breed.name)
                             .font(.system(size: 12))
+                            .accessibilityLabel(A11y.Breeds.name)
+                            .accessibilityIdentifier("Cat breed name")
                     }
                 }
             }
             .padding()
+            .accessibilityLabel(A11y.Breeds.list)
+            .accessibilityIdentifier("Cat breed list")
         }
     }
     
