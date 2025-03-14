@@ -1,3 +1,4 @@
+import class Combine.AnyCancellable
 import SwiftUI
 
 final class BreedsViewModel: ObservableObject {
@@ -8,24 +9,24 @@ final class BreedsViewModel: ObservableObject {
     let repository: RepositoryProtocol
     
     init() {
+    private var cancellable: AnyCancellable?
         viewState = .initial
         repository = Repository()
     }
 
     @MainActor
-    func fetchBreeds() async {
+    func fetchBreeds() {
         viewState = .loading
-        do {
-            breeds = try await repository.fetchBreeds()
-            viewState = .loaded(breeds)
-        } catch {
-            viewState = .error(error.localizedDescription)
-        }
-    }
-    
-    func refresh() {
-        Task {
-            await fetchBreeds()
-        }
+        cancellable = repository.fetchBreeds()
+            .sink { [weak self] completion in
+                switch completion {
+                case let .failure(error):
+                    self?.viewState = .error(error.localizedDescription)
+                case .finished:
+                    break
+                }
+            } receiveValue: { [weak self] value in
+                self?.viewState = .loaded(value)
+            }
     }
 }
