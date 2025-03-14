@@ -91,7 +91,14 @@ struct BreedsView: View {
             case let .success(image):
                 image
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
+                    .frame(
+                        width: Constants.Image.size,
+                        height: Constants.Image.size
+                    )
+                    .clipShape(
+                        .rect(cornerRadius: 5)
+                    )
             @unknown default:
                 Image(systemName: Constants.Image.placeHolder)
                     .font(.largeTitle)
