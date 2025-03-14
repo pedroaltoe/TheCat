@@ -1,7 +1,7 @@
 import SwiftUI
 
 final class BreedsViewModel: ObservableObject {
-    
+
     @Published private(set) var viewState: BreedsViewState
     
     var breeds: [Breed] = []
@@ -11,7 +11,7 @@ final class BreedsViewModel: ObservableObject {
         viewState = .initial
         repository = Repository()
     }
-    
+
     @MainActor
     func fetchBreeds() async {
         viewState = .loading

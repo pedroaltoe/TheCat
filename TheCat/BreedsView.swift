@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct BreedsView: View {
-    
+
     @ObservedObject var viewModel: BreedsViewModel
-    
+
     let columns = [
         GridItem(.adaptive(minimum: Constants.Item.size))
     ]
-    
+
     var body: some View {
         switch viewModel.viewState {
         case .initial:
@@ -29,7 +29,7 @@ struct BreedsView: View {
             VStack(spacing: Space.medium) {
                 Text(error.capitalizingFirstLetter())
                     .font(.title3)
-                
+
                 Button {
                     viewModel.refresh()
                 } label: {
@@ -44,12 +44,12 @@ struct BreedsView: View {
             progressView
         }
     }
-    
+
     @ViewBuilder var progressView: some View {
         ProgressView()
             .padding()
     }
-    
+
     @ViewBuilder func loadedView(_ breeds: [Breed]) -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: Space.large) {
@@ -59,7 +59,7 @@ struct BreedsView: View {
                             breedImage(breed)
                                 .accessibilityLabel(A11y.Breeds.image)
                                 .accessibilityIdentifier("Cat breed image")
-                            
+
                             if breed.isFavorite == true {
                                 Image(systemName: Constants.Image.favorite)
                                     .renderingMode(.original)
@@ -67,7 +67,7 @@ struct BreedsView: View {
                                     .accessibilityIdentifier("Cat breed favorite")
                             }
                         }
-                        
+
                         Text(breed.name)
                             .font(.system(size: 12))
                             .accessibilityLabel(A11y.Breeds.name)
@@ -80,7 +80,7 @@ struct BreedsView: View {
             .accessibilityIdentifier("Cat breed list")
         }
     }
-    
+
     @ViewBuilder func breedImage(_ breed: Breed) -> some View {
         CacheAsyncImage(url: URL(string: breed.image?.url ?? "")) { phase in
             switch phase {
