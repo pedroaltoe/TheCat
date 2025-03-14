@@ -7,17 +7,26 @@ protocol APIClientProtocol {
     func fetchBreeds() -> AnyPublisher<[Breed], Error>
 }
 
+enum APIEndpoint {
+    private static let baseURL = "https://api.thecatapi.com/v1"
+
+    case getBreeds
+
+    var url: String {
+        switch self {
+        case .getBreeds: return "\(Self.baseURL)/breeds"
+        }
+    }
+}
+
 final class APIClient: APIClientProtocol {
     
     func fetchBreeds() -> AnyPublisher<[Breed], Error> {
-        guard let url = URL(string: "https://api.thecatapi.com/v1/breeds") else {
+        guard let url = URL(string: APIEndpoint.getBreeds.url) else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         var request = URLRequest(url: url)
-        request.setValue(
-            "live_HUApwD4JQqYgPtRXO0P0tyNfolxiKv9yn4lWb5BFF3zdiRvaDQCmZ8n6SNtDsAG2",
-            forHTTPHeaderField: "x-api-key"
-        )
+        request.allHTTPHeaderFields = setupHeaders()
         
         return URLSession.shared
             .dataTaskPublisher(for: request)
@@ -31,6 +40,15 @@ final class APIClient: APIClientProtocol {
             }
             .decode(type: [Breed].self, decoder: JSONDecoder())
             .eraseToAnyPublisher()
+    }
+
+    // MARK: - Helpers
+
+    private func setupHeaders() -> [String: String] {
+        var headers: [String: String] = [:]
+        headers["Content-Type"] = "application/json"
+        headers["x-api-key"] = "live_HUApwD4JQqYgPtRXO0P0tyNfolxiKv9yn4lWb5BFF3zdiRvaDQCmZ8n6SNtDsAG2"
+        return headers
     }
 }
 
