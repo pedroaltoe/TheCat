@@ -13,17 +13,17 @@ struct BreedsView: View {
         case .initial:
             progressView
                 .task {
-                    await viewModel.fetchBreeds()
+                    viewModel.fetchBreeds()
                 }
                 .refreshable {
-                    await viewModel.fetchBreeds()
+                    viewModel.fetchBreeds()
                 }
         case .loading:
             progressView
         case let .loaded(breeds):
             loadedView(breeds)
                 .refreshable {
-                    await viewModel.fetchBreeds()
+                    viewModel.fetchBreeds()
                 }
         case let .error(error):
             VStack(spacing: Space.medium) {
@@ -31,7 +31,7 @@ struct BreedsView: View {
                     .font(.title3)
 
                 Button {
-                    viewModel.refresh()
+                    viewModel.fetchBreeds()
                 } label: {
                     Text(Constants.Text.refresh)
                 }
@@ -40,8 +40,6 @@ struct BreedsView: View {
                 .accessibilityLabel(A11y.Breeds.refreshButton)
                 .accessibilityIdentifier("Refresh button")
             }
-        case .loadingMore:
-            progressView
         }
     }
 
