@@ -4,14 +4,14 @@ import SwiftUI
 final class BreedsViewModel: ObservableObject {
 
     @Published private(set) var viewState: BreedsViewState
-    
-    var breeds: [Breed] = []
-    let repository: RepositoryProtocol
-    
-    init() {
+
     private var cancellable: AnyCancellable?
+
+    let repository: Repository
+
+    init(repository: Repository = RepositoryBuilder.makeRepository(api: APIClient())) {
         viewState = .initial
-        repository = Repository()
+        self.repository = repository
     }
 
     @MainActor
