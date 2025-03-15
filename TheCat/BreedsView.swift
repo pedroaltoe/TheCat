@@ -20,8 +20,8 @@ struct BreedsView: View {
                 }
         case .loading:
             progressView
-        case let .loaded(breeds):
             loadedView(breeds)
+        case let .present(breeds):
                 .refreshable {
                     viewModel.fetchBreeds()
                 }

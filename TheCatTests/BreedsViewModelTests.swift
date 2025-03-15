@@ -73,8 +73,8 @@ class MyViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
 
         // then
-        guard case .loaded = expectedViewState else {
-            XCTFail("expected viewState to be '.loaded'!")
+        guard case .present = expectedViewState else {
+            XCTFail("Expected viewState to be '.loaded'!")
             return
         }
     }
