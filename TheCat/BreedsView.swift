@@ -20,8 +20,8 @@ struct BreedsView: View {
                 }
         case .loading:
             progressView
-            loadedView(breeds)
         case let .present(breeds):
+            contentView(breeds)
                 .refreshable {
                     viewModel.fetchBreeds()
                 }
@@ -48,7 +48,7 @@ struct BreedsView: View {
             .padding()
     }
 
-    @ViewBuilder func loadedView(_ breeds: [Breed]) -> some View {
+    @ViewBuilder func contentView(_ breeds: [Breed]) -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: Space.large) {
                 ForEach(breeds) { breed in
