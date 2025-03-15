@@ -13,6 +13,8 @@ final class BreedsViewModel: ObservableObject {
 
     let repository: Repository
 
+    // MARK: Init
+
     init(repository: Repository = RepositoryBuilder.makeRepository(api: APIClient())) {
         viewState = .initial
         self.repository = repository
@@ -41,6 +43,8 @@ final class BreedsViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
+
+    // MARK: Funcs
 
     private func setUpObservers() {
         $searchText

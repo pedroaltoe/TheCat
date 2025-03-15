@@ -8,6 +8,8 @@ struct BreedsView: View {
         GridItem(.adaptive(minimum: Constants.Item.size))
     ]
 
+    // MARK: Body
+
     var body: some View {
         switch viewModel.viewState {
         case .initial:
@@ -48,6 +50,8 @@ struct BreedsView: View {
             .padding()
     }
 
+    // MARK: Content
+
     @ViewBuilder func contentView(_ breeds: [Breed]) -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: Space.large) {
@@ -82,6 +86,8 @@ struct BreedsView: View {
             placement: .navigationBarDrawer(displayMode: .always)
         )
     }
+
+    // MARK: Image
 
     @ViewBuilder func breedImage(_ breed: Breed) -> some View {
         CacheAsyncImage(url: URL(string: breed.image?.url ?? "")) { phase in
