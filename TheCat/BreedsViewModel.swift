@@ -26,7 +26,7 @@ final class BreedsViewModel: ObservableObject {
                     break
                 }
             } receiveValue: { [weak self] value in
-                self?.viewState = .loaded(value)
+                self?.viewState = .present(value)
             }
     }
 }
