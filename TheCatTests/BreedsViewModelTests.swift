@@ -75,6 +75,36 @@ class MyViewModelTests: XCTestCase {
         }
     }
 
+    @MainActor func testFilterBreeds() {
+        // given
+        let expectation = expectation(description: "Wait for main thread sink")
+        expectation.expectedFulfillmentCount = 4
+        var expectedViewState: BreedsViewState?
+        let viewModel = makeViewModelWithSuccessRepository()
+
+        // when
+        viewModel.$viewState
+            .dropFirst()
+            .sink {
+                expectedViewState = $0
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        viewModel.fetchBreeds()
+        viewModel.searchText = "ae"
+
+        wait(for: [expectation], timeout: 1.0)
+
+        // then
+        guard case let .present(breeds) = expectedViewState else {
+            XCTFail("Expected viewState to be '.present'!")
+            return
+        }
+
+        XCTAssertEqual(breeds.first?.name, "Aegean")
+    }
+
     // MARK: Helpers
 
     private func makeViewModelWithSuccessRepository() -> BreedsViewModel {

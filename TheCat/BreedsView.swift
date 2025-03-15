@@ -77,6 +77,10 @@ struct BreedsView: View {
             .accessibilityLabel(A11y.Breeds.list)
             .accessibilityIdentifier("Cat breed list")
         }
+        .searchable(
+            text: $viewModel.searchText,
+            placement: .navigationBarDrawer(displayMode: .always)
+        )
     }
 
     @ViewBuilder func breedImage(_ breed: Breed) -> some View {
