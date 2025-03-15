@@ -53,11 +53,7 @@ class MyViewModelTests: XCTestCase {
         let expectation = expectation(description: "Wait for main thread sink")
         expectation.expectedFulfillmentCount = 2
         var expectedViewState: BreedsViewState?
-        let successRepository = Repository.mock {
-            Just(Breed.mockBreeds).setFailureType(to: Error.self)
-                .eraseToAnyPublisher()
-        }
-        let viewModel = BreedsViewModel(repository: successRepository)
+        let viewModel = makeViewModelWithSuccessRepository()
 
         // when
         viewModel.$viewState
@@ -77,5 +73,16 @@ class MyViewModelTests: XCTestCase {
             XCTFail("Expected viewState to be '.present'!")
             return
         }
+    }
+
+    // MARK: Helpers
+
+    private func makeViewModelWithSuccessRepository() -> BreedsViewModel {
+        let successRepository = Repository.mock {
+            Just(Breed.mockBreeds).setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+
+        return BreedsViewModel(repository: successRepository)
     }
 }
