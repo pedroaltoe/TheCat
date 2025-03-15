@@ -3,28 +3,29 @@ import class Combine.AnyCancellable
 import XCTest
 
 final class RepositoryTests: XCTestCase {
-    
+
     private var repository: Repository!
     private var apiClientMock: APIClientMock!
     private var cancellables: Set<AnyCancellable>!
-    
+
     override func setUp() {
         apiClientMock = APIClientMock()
         repository = RepositoryBuilder.makeRepository(api: apiClientMock)
         cancellables = Set()
     }
-    
+
     override func tearDown() {
         repository = nil
         apiClientMock = nil
         cancellables = nil
     }
-    
+
+    func testFetchBreedsSuccess() {
         // given
         apiClientMock.shouldReturnError = false
-        
+
         let expectation = self.expectation(description: "Fetch users succeeds")
-        
+
         // when
         repository.fetchBreeds()
             .sink(receiveCompletion: { completion in
@@ -43,17 +44,16 @@ final class RepositoryTests: XCTestCase {
                 XCTAssertEqual(breeds[2].name, "American Bobtail")
             })
             .store(in: &cancellables)
-        
+
         waitForExpectations(timeout: 1.0)
     }
-    
 
     func testFetchBreedsFailure() {
         // given
         apiClientMock.shouldReturnError = true
-        
+
         let expectation = self.expectation(description: "Fetch users fails")
-        
+
         // when
         apiClientMock.fetchBreeds()
             .sink(receiveCompletion: { completion in
@@ -69,7 +69,7 @@ final class RepositoryTests: XCTestCase {
                 XCTFail("Expected failure")
             })
             .store(in: &cancellables)
-        
+
         waitForExpectations(timeout: 1.0)
     }
 }
