@@ -47,6 +47,7 @@ struct BreedsView: View {
 
     @ViewBuilder var progressView: some View {
         ProgressView()
+            .controlSize(.large)
             .padding()
     }
 
