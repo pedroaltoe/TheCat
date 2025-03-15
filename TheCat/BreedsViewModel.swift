@@ -11,7 +11,7 @@ final class BreedsViewModel: ObservableObject {
     private var filteredBreeds: [Breed] = []
     private var cancellables = Set<AnyCancellable>()
 
-    let repository: Repository
+    private let repository: Repository
 
     // MARK: Init
 
