@@ -26,7 +26,6 @@ final class BreedsViewModel: ObservableObject {
 
     @MainActor
     func fetchBreeds() {
-        viewState = .loading
         repository.fetchBreeds()
             .sink { [weak self] completion in
                 switch completion {

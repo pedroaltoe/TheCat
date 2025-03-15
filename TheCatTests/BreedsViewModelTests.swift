@@ -25,7 +25,6 @@ class MyViewModelTests: XCTestCase {
     @MainActor func testFetchBreedsFailure() {
         // given
         let expectation = expectation(description: "Wait for main thread sink")
-        expectation.expectedFulfillmentCount = 2
         var expectedViewState: BreedsViewState?
 
         // when
@@ -78,7 +77,7 @@ class MyViewModelTests: XCTestCase {
     @MainActor func testFilterBreeds() {
         // given
         let expectation = expectation(description: "Wait for main thread sink")
-        expectation.expectedFulfillmentCount = 4
+        expectation.expectedFulfillmentCount = 3
         var expectedViewState: BreedsViewState?
         let viewModel = makeViewModelWithSuccessRepository()
 
