@@ -27,7 +27,7 @@ final class RepositoryTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch users succeeds")
 
         // when
-        repository.fetchBreeds()
+        repository.fetchBreeds(0)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -55,7 +55,7 @@ final class RepositoryTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch users fails")
 
         // when
-        apiClientMock.fetchBreeds()
+        apiClientMock.fetchBreeds(0)
             .sink(receiveCompletion: { completion in
                 // then
                 switch completion {

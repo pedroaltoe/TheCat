@@ -107,7 +107,7 @@ class MyViewModelTests: XCTestCase {
     // MARK: Helpers
 
     private func makeViewModelWithSuccessRepository() -> BreedsViewModel {
-        let successRepository = Repository.mock {
+        let successRepository = Repository.mock { _ in 
             Just(Breed.mockBreeds).setFailureType(to: Error.self)
                 .eraseToAnyPublisher()
         }

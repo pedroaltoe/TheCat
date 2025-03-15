@@ -7,8 +7,11 @@ final class BreedsViewModel: ObservableObject {
     
     @Published var searchText = ""
 
+    @Published var isLoadingMore = false
+
     private var breeds: [Breed] = []
     private var filteredBreeds: [Breed] = []
+    private var page = 0
     private var cancellables = Set<AnyCancellable>()
 
     private let repository: Repository
@@ -24,23 +27,40 @@ final class BreedsViewModel: ObservableObject {
 
     // MARK: Fetch data
 
-    @MainActor
-    func fetchBreeds() {
-        repository.fetchBreeds()
+    @MainActor func fetchBreeds(_ page: Int = 0) {
+        repository.fetchBreeds(page)
             .sink { [weak self] completion in
                 switch completion {
                 case let .failure(error):
                     self?.viewState = .error(error.localizedDescription)
                 case .finished:
                     self?.searchText = ""
+                    self?.isLoadingMore = false
                     break
                 }
             } receiveValue: { [weak self] value in
-                self?.viewState = .present(value)
-                self?.breeds = value
-                self?.filteredBreeds = value
+                guard let self, !value.isEmpty else { return }
+                if page > 0 {
+                    breeds.append(contentsOf: value)
+                } else {
+                    breeds = value
+                }
+                viewState = .present(breeds)
+                filteredBreeds = breeds
             }
             .store(in: &cancellables)
+    }
+
+    @MainActor func refreshBreeds() {
+        page = 0
+        fetchBreeds()
+    }
+
+    @MainActor func fetchMoreBreeds(from lastBreedId: String) {
+        guard lastBreedId == breeds.last?.id else { return }
+        isLoadingMore = true
+        page += 1
+        fetchBreeds(page)
     }
 
     // MARK: Funcs

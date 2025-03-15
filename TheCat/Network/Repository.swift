@@ -8,9 +8,9 @@ enum RepositoryError: Error {
 }
 
 struct Repository {
-    var fetchBreeds: () -> AnyPublisher<[Breed], Error>
+    var fetchBreeds: (_ page: Int) -> AnyPublisher<[Breed], Error>
 
-    init(fetchBreeds: @escaping () -> AnyPublisher<[Breed], Error>) {
+    init(fetchBreeds: @escaping (_ page: Int) -> AnyPublisher<[Breed], Error>) {
         self.fetchBreeds = fetchBreeds
     }
 }
@@ -18,9 +18,9 @@ struct Repository {
 #if targetEnvironment(simulator)
 extension Repository {
 
-    static func mock(fetchBreeds: (() -> AnyPublisher<[Breed], Error>)? = nil) -> Repository {
+    static func mock(fetchBreeds: ((_ page: Int) -> AnyPublisher<[Breed], Error>)? = nil) -> Repository {
         Repository(
-            fetchBreeds: fetchBreeds ?? {
+            fetchBreeds: fetchBreeds ?? { _ in
                 Fail(error: URLError(.badServerResponse))
                     .eraseToAnyPublisher()
             }

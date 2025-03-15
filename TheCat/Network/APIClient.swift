@@ -4,25 +4,25 @@ import struct Combine.Just
 import Foundation
 
 protocol APIClientProtocol {
-    func fetchBreeds() -> AnyPublisher<[Breed], Error>
+    func fetchBreeds(_ page: Int) -> AnyPublisher<[Breed], Error>
 }
 
 enum APIEndpoint {
     private static let baseURL = "https://api.thecatapi.com/v1"
 
-    case getBreeds
+    case getBreeds(page: Int)
 
     var url: String {
         switch self {
-        case .getBreeds: return "\(Self.baseURL)/breeds"
+        case let .getBreeds(page): return "\(Self.baseURL)/breeds?limit=15&page=\(page)"
         }
     }
 }
 
 final class APIClient: APIClientProtocol {
     
-    func fetchBreeds() -> AnyPublisher<[Breed], Error> {
-        guard let url = URL(string: APIEndpoint.getBreeds.url) else {
+    func fetchBreeds(_ page: Int) -> AnyPublisher<[Breed], Error> {
+        guard let url = URL(string: APIEndpoint.getBreeds(page: page).url) else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         var request = URLRequest(url: url)
@@ -60,7 +60,7 @@ struct APIClientMock: APIClientProtocol {
     
     var shouldReturnError = false
 
-    func fetchBreeds() -> AnyPublisher<[Breed], Error> {
+    func fetchBreeds(_ page: Int) -> AnyPublisher<[Breed], Error> {
         if shouldReturnError {
             return Fail(error: APIClientMock.MockError.failure)
                 .eraseToAnyPublisher()

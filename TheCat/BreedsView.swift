@@ -17,13 +17,15 @@ struct BreedsView: View {
                 .task {
                     viewModel.fetchBreeds()
                 }
-                .refreshable {
-                    viewModel.fetchBreeds()
-                }
         case let .present(breeds):
             contentView(breeds)
                 .refreshable {
-                    viewModel.fetchBreeds()
+                    viewModel.refreshBreeds()
+                }
+                .overlay {
+                    if viewModel.isLoadingMore {
+                        progressView
+                    }
                 }
         case let .error(error):
             VStack(spacing: Space.medium) {
@@ -31,7 +33,7 @@ struct BreedsView: View {
                     .font(.title3)
 
                 Button {
-                    viewModel.fetchBreeds()
+                    viewModel.refreshBreeds()
                 } label: {
                     Text(Constants.Text.refresh)
                 }
@@ -72,6 +74,9 @@ struct BreedsView: View {
                             .font(.system(size: 12))
                             .accessibilityLabel(A11y.Breeds.name)
                             .accessibilityIdentifier("Cat breed name")
+                    }
+                    .onAppear {
+                        viewModel.fetchMoreBreeds(from: breed.id)
                     }
                 }
             }
