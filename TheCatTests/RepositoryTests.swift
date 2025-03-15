@@ -20,7 +20,6 @@ final class RepositoryTests: XCTestCase {
         cancellables = nil
     }
     
-    func testFetchUsersReturnsUsers() {
         // given
         apiClientMock.shouldReturnError = false
         
@@ -33,7 +32,7 @@ final class RepositoryTests: XCTestCase {
                 case .finished:
                     break
                 case .failure(let error):
-                    XCTFail("Expected success, but got error: \(error)")
+                    XCTFail("Error: \(error)")
                 }
                 expectation.fulfill()
             }, receiveValue: { breeds in
@@ -48,7 +47,8 @@ final class RepositoryTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
     }
     
-    func testFetchUsersReturnsError() {
+
+    func testFetchBreedsFailure() {
         // given
         apiClientMock.shouldReturnError = true
         
@@ -60,13 +60,13 @@ final class RepositoryTests: XCTestCase {
                 // then
                 switch completion {
                 case .finished:
-                    XCTFail("Expected failure, but got success")
+                    XCTFail("Expected failure")
                 case .failure(let error):
                     XCTAssertEqual(error.localizedDescription, APIClientMock.MockError.failure.localizedDescription)
                 }
                 expectation.fulfill()
             }, receiveValue: { _ in
-                XCTFail("Expected failure, but got success")
+                XCTFail("Expected failure")
             })
             .store(in: &cancellables)
         

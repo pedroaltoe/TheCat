@@ -22,7 +22,7 @@ class MyViewModelTests: XCTestCase {
         super.tearDown()
     }
 
-    @MainActor func testFetchData_Failure() {
+    @MainActor func testFetchBreedsFailure() {
         // given
         let expectation = expectation(description: "Wait for main thread sink")
         expectation.expectedFulfillmentCount = 2
@@ -43,12 +43,12 @@ class MyViewModelTests: XCTestCase {
 
         // then
         guard case .error = expectedViewState else {
-            XCTFail("expected viewState to be '.error'!")
+            XCTFail("Expected viewState to be '.error'!")
             return
         }
     }
 
-    @MainActor func testFetchData_Success() {
+    @MainActor func testFetchBreedsSuccess() {
         // given
         let expectation = expectation(description: "Wait for main thread sink")
         expectation.expectedFulfillmentCount = 2
