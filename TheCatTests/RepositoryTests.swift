@@ -20,6 +20,8 @@ final class RepositoryTests: XCTestCase {
         cancellables = nil
     }
 
+    // MARK: Breeds
+
     func testFetchBreedsSuccess() {
         // given
         apiClientMock.shouldReturnError = false
