@@ -71,8 +71,15 @@ final class APIClient: APIClientProtocol {
     private func setupHeaders() -> [String: String] {
         var headers: [String: String] = [:]
         headers["Content-Type"] = "application/json"
-        headers["x-api-key"] = "live_HUApwD4JQqYgPtRXO0P0tyNfolxiKv9yn4lWb5BFF3zdiRvaDQCmZ8n6SNtDsAG2"
+        headers["x-api-key"] = loadAPIKey()
         return headers
+    }
+
+    func loadAPIKey() -> String {
+        guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist"),
+              let dict = NSDictionary(contentsOfFile: path),
+              let apiKey = dict["API_KEY"] as? String else { return "" }
+        return apiKey
     }
 }
 
