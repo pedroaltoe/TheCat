@@ -32,6 +32,18 @@ struct BreedDetailsView: View {
         }
         .navigationTitle(viewModel.breed.name)
         .padding(.horizontal, Space.large)
+
+        Spacer()
+
+        Button {
+            print("Add to favourites")
+        } label: {
+            Text(Localized.Details.addToFavouritesButton)
+        }
+        .buttonStyle(.borderedProminent)
+        .font(.body)
+        .accessibilityLabel(A11y.Details.addToFavouritesButton)
+        .accessibilityIdentifier("Add to favourites button")
     }
 
     @ViewBuilder var image: some View {
