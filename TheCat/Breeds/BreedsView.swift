@@ -4,6 +4,8 @@ struct BreedsView: View {
 
     @ObservedObject var viewModel: BreedsViewModel
 
+    @State private var isShowingDetailView = false
+
     let columns = [
         GridItem(.adaptive(minimum: Constants.Item.size))
     ]
@@ -15,7 +17,7 @@ struct BreedsView: View {
         case .initial:
             progressView
                 .task {
-                    viewModel.fetchBreeds()
+                    viewModel.fetchFavourites()
                 }
         case let .present(breeds):
             contentView(breeds)
@@ -35,7 +37,7 @@ struct BreedsView: View {
                 Button {
                     viewModel.refreshBreeds()
                 } label: {
-                    Text(Constants.Text.refresh)
+                    Text(Localized.refresh)
                 }
                 .buttonStyle(.borderedProminent)
                 .font(.body)
@@ -57,27 +59,11 @@ struct BreedsView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: Space.large) {
                 ForEach(breeds) { breed in
-                    VStack(spacing: Space.small) {
-                        ZStack(alignment: .topTrailing) {
-                            breedImage(breed)
-                                .accessibilityLabel(A11y.Breeds.image)
-                                .accessibilityIdentifier("Cat breed image")
-
-                            if breed.isFavorite == true {
-                                Image(systemName: Constants.Image.favorite)
-                                    .renderingMode(.original)
-                                    .accessibilityLabel(A11y.Breeds.favorite)
-                                    .accessibilityIdentifier("Cat breed favorite")
-                            }
-                        }
-
-                        Text(breed.name)
-                            .font(.system(size: 12))
-                            .accessibilityLabel(A11y.Breeds.name)
-                            .accessibilityIdentifier("Cat breed name")
-                    }
-                    .onAppear {
-                        viewModel.fetchMoreBreeds(from: breed.id)
+                    NavigationLink {
+                        BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
+                    } label: {
+                        item(breed)
+                            .tint(.primary)
                     }
                 }
             }
@@ -89,6 +75,31 @@ struct BreedsView: View {
             text: $viewModel.searchText,
             placement: .navigationBarDrawer(displayMode: .always)
         )
+    }
+
+    @ViewBuilder func item(_ breed: Breed) -> some View {
+        VStack(spacing: Space.small) {
+            ZStack(alignment: .topTrailing) {
+                breedImage(breed)
+                    .accessibilityLabel(A11y.Breeds.image)
+                    .accessibilityIdentifier("Cat breed image")
+
+                if breed.isFavorite == true {
+                    Image(systemName: Constants.Image.favorite)
+                        .renderingMode(.original)
+                        .accessibilityLabel(A11y.Breeds.favorite)
+                        .accessibilityIdentifier("Cat breed favorite")
+                }
+            }
+
+            Text(breed.name)
+                .font(.system(size: 12))
+                .accessibilityLabel(A11y.Breeds.name(breed.name))
+                .accessibilityIdentifier("Cat breed name")
+        }
+        .onAppear {
+            viewModel.fetchMoreBreeds(from: breed.id)
+        }
     }
 
     // MARK: Image

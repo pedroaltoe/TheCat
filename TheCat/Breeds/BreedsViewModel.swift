@@ -11,6 +11,7 @@ final class BreedsViewModel: ObservableObject {
 
     private var breeds: [Breed] = []
     private var filteredBreeds: [Breed] = []
+    private var favourites: [Breed] = []
     private var page = 0
     private var cancellables = Set<AnyCancellable>()
 
@@ -26,6 +27,22 @@ final class BreedsViewModel: ObservableObject {
     }
 
     // MARK: Fetch data
+
+    @MainActor func fetchFavourites() {
+        repository.fetchFavourites()
+            .sink { [weak self] completion in
+                switch completion {
+                case let .failure(error):
+                    self?.viewState = .error(error.localizedDescription)
+                case .finished:
+                    break
+                }
+            } receiveValue: { [weak self] value in
+                self?.favourites = value
+                self?.fetchBreeds()
+            }
+            .store(in: &cancellables)
+    }
 
     @MainActor func fetchBreeds(_ page: Int = 0) {
         repository.fetchBreeds(page)
