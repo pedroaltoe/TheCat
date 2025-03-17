@@ -8,24 +8,24 @@ struct BreedDetailsView: View {
         ScrollView {
             VStack(spacing: Space.extraExtraLarge) {
                 image
-                    .accessibilityLabel(A11y.Detail.image)
+                    .accessibilityLabel(A11y.Details.image)
                     .accessibilityIdentifier("Image")
 
                 VStack(alignment: .leading, spacing: Space.medium) {
-                    Text("\(Localized.origin): \(viewModel.breed.origin)")
+                    Text("\(Localized.Details.origin): \(viewModel.breed.origin)")
                         .font(.subheadline)
-                        .accessibilityLabel(A11y.Detail.origin(viewModel.breed.origin))
+                        .accessibilityLabel(A11y.Details.origin(viewModel.breed.origin))
                         .accessibilityIdentifier("Origin")
 
-                    Text("\(Localized.temperament): \(viewModel.breed.temperament)")
+                    Text("\(Localized.Details.temperament): \(viewModel.breed.temperament)")
                         .font(.subheadline)
-                        .accessibilityLabel(A11y.Detail.temperament(viewModel.breed.temperament))
+                        .accessibilityLabel(A11y.Details.temperament(viewModel.breed.temperament))
                         .accessibilityIdentifier("Temperament")
 
-                    Text("\(Localized.description): \(viewModel.breed.description)")
+                    Text("\(Localized.Details.description): \(viewModel.breed.description)")
                         .font(.body)
                         .lineLimit(nil)
-                        .accessibilityLabel(A11y.Detail.description(viewModel.breed.description))
+                        .accessibilityLabel(A11y.Details.description(viewModel.breed.description))
                         .accessibilityIdentifier("Description")
                 }
             }

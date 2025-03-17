@@ -37,7 +37,7 @@ struct BreedsView: View {
                 Button {
                     viewModel.refreshBreeds()
                 } label: {
-                    Text(Localized.refresh)
+                    Text(Localized.Breeds.refresh)
                 }
                 .buttonStyle(.borderedProminent)
                 .font(.body)

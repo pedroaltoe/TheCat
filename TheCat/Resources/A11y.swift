@@ -10,7 +10,7 @@ enum A11y {
         }
     }
 
-    enum Detail {
+    enum Details {
         static var image = "Cat image"
 
         static func origin(_ origin: String) -> String {
@@ -24,5 +24,7 @@ enum A11y {
         static func description(_ description: String) -> String {
             "Cat description \(description)"
         }
+
+        static var addToFavouritesButton = "Add to favourites button"
     }
 }

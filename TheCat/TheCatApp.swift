@@ -9,10 +9,10 @@ struct TheCatApp: App {
                 TabView {
                     BreedsView(viewModel: BreedsViewModel())
                         .tabItem {
-                            Label(Localized.catsListButton, systemImage: Constants.Image.catsList)
+                            Label(Localized.Breeds.catsListButton, systemImage: Constants.Image.catsList)
                         }
                 }
-                .navigationTitle(Localized.title)
+                .navigationTitle(Localized.Breeds.title)
             }
         }
     }
