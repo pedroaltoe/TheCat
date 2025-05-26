@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BreedsView: View {
 
-    @ObservedObject var viewModel: BreedsViewModel
+    @Bindable var viewModel: BreedsViewModel
 
     @State private var isShowingDetailView = false
 
@@ -16,13 +16,13 @@ struct BreedsView: View {
         switch viewModel.viewState {
         case .initial:
             progressView
-                .task {
-                    viewModel.fetchFavourites()
+                .onAppear {
+                    viewModel.onAppear()
                 }
         case let .present(breeds):
             contentView(breeds)
                 .refreshable {
-                    viewModel.refreshBreeds()
+                    viewModel.onRefresh()
                 }
                 .overlay {
                     if viewModel.isLoadingMore {
@@ -35,7 +35,7 @@ struct BreedsView: View {
                     .font(.title3)
 
                 Button {
-                    viewModel.refreshBreeds()
+                    viewModel.onRefresh()
                 } label: {
                     Text(Localized.Breeds.refresh)
                 }
@@ -136,6 +136,8 @@ struct BreedsView: View {
     }
 }
 
+#if targetEnvironment(simulator)
 #Preview {
     BreedsView(viewModel: BreedsViewModel())
 }
+#endif

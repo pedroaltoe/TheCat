@@ -1,95 +1,94 @@
-import class Combine.AnyCancellable
+import Observation
 import SwiftUI
 
-final class BreedsViewModel: ObservableObject {
+@MainActor
+@Observable
+final class BreedsViewModel {
 
-    @Published private(set) var viewState: BreedsViewState
+    private(set) var viewState: BreedsViewState
     
-    @Published var searchText = ""
+    var searchText = "" {
+        didSet {
+            filterBreeds(searchText)
+        }
+    }
 
-    @Published var isLoadingMore = false
+    var isLoadingMore = false
 
     private var breeds: [Breed] = []
     private var filteredBreeds: [Breed] = []
     private var favourites: [Breed] = []
     private var page = 0
-    private var cancellables = Set<AnyCancellable>()
 
-    private let repository: Repository
+    private let repository: RepositoryProtocol
 
     // MARK: Init
 
-    init(repository: Repository = RepositoryBuilder.makeRepository(api: APIClient())) {
+    init(repository: RepositoryProtocol = RepositoryBuilder.makeRepository(api: APIClient())) {
         viewState = .initial
         self.repository = repository
-
-        setUpObservers()
     }
 
     // MARK: Fetch data
 
-    @MainActor func fetchFavourites() {
-        repository.fetchFavourites()
-            .sink { [weak self] completion in
-                switch completion {
-                case let .failure(error):
-                    self?.viewState = .error(error.localizedDescription)
-                case .finished:
-                    break
-                }
-            } receiveValue: { [weak self] value in
-                self?.favourites = value
-                self?.fetchBreeds()
+    func fetchFavourites() async {
+        do {
+            let favourites = try await repository.fetchFavourites()
+            viewState = .present(favourites)
+        } catch {
+            viewState = .error(error.localizedDescription)
+        }
+    }
+
+    func fetchBreeds(_ page: Int = 0) async {
+        do {
+            let breeds = try await repository.fetchBreeds(page)
+
+            guard !breeds.isEmpty else {
+                isLoadingMore = false
+                return
             }
-            .store(in: &cancellables)
-    }
 
-    @MainActor func fetchBreeds(_ page: Int = 0) {
-        repository.fetchBreeds(page)
-            .sink { [weak self] completion in
-                switch completion {
-                case let .failure(error):
-                    self?.viewState = .error(error.localizedDescription)
-                case .finished:
-                    self?.searchText = ""
-                    self?.isLoadingMore = false
-                    break
-                }
-            } receiveValue: { [weak self] value in
-                guard let self, !value.isEmpty else { return }
-                if page > 0 {
-                    breeds.append(contentsOf: value)
-                } else {
-                    breeds = value
-                }
-                viewState = .present(breeds)
-                filteredBreeds = breeds
+            if page > 0 {
+                self.breeds.append(contentsOf: breeds)
+            } else {
+                self.breeds = breeds
             }
-            .store(in: &cancellables)
+
+            viewState = .present(self.breeds)
+            filteredBreeds = self.breeds
+        } catch {
+            viewState = .error(error.localizedDescription)
+        }
+
+        isLoadingMore = false
     }
 
-    @MainActor func refreshBreeds() {
-        page = 0
-        fetchBreeds()
-    }
-
-    @MainActor func fetchMoreBreeds(from lastBreedId: String) {
+    func fetchMoreBreeds(from lastBreedId: String) {
         guard lastBreedId == breeds.last?.id else { return }
         isLoadingMore = true
         page += 1
-        fetchBreeds(page)
+
+        Task {
+            await fetchBreeds(page)
+        }
     }
 
-    // MARK: Funcs
-
-    private func setUpObservers() {
-        $searchText
-            .dropFirst()
-            .sink { [weak self] text in
-                self?.filterBreeds(text)
-            }
-            .store(in: &cancellables)
+    func onAppear() {
+        page = 0
+        Task {
+            await fetchBreeds()
+        }
     }
+
+    func onRefresh() {
+        page = 0
+        Task {
+            await fetchBreeds()
+        }
+    }
+
+    // MARK: Search
 
     private func filterBreeds(_ text: String) {
         if text.isEmpty {
