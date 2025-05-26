@@ -25,28 +25,25 @@ enum APIEndpoint {
 final class APIClient: APIClientProtocol {
     
     func fetchBreeds(_ page: Int) -> AnyPublisher<[Breed], Error> {
-        guard let url = URL(string: APIEndpoint.getBreeds(page: page).url) else {
-            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
-        }
-        var request = URLRequest(url: url)
-        request.allHTTPHeaderFields = setupHeaders()
-        
-        return URLSession.shared
-            .dataTaskPublisher(for: request)
-            .receive(on: DispatchQueue.main)
-            .tryMap() { element -> Data in
-                guard let httpResponse = element.response as? HTTPURLResponse,
-                      httpResponse.statusCode == 200 else {
-                    throw URLError(.badServerResponse)
-                }
-                return element.data
-            }
-            .decode(type: [Breed].self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
+        fetch(from: .getBreeds(page: page))
     }
 
     func fetchFavourites() -> AnyPublisher<[Breed], Error> {
-        guard let url = URL(string: APIEndpoint.getFavourites.url) else {
+        fetch(from: .getFavourites)
+    }
+
+    // MARK: - Helpers
+
+    private func fetch(from endpoint: APIEndpoint) -> AnyPublisher<[Breed], Error> {
+        var url: URL?
+        switch endpoint {
+        case let .getBreeds(page):
+            url = URL(string: APIEndpoint.getBreeds(page: page).url)
+        case .getFavourites:
+            url = URL(string: APIEndpoint.getFavourites.url)
+        }
+
+        guard let url else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         var request = URLRequest(url: url)
@@ -65,8 +62,6 @@ final class APIClient: APIClientProtocol {
             .decode(type: [Breed].self, decoder: JSONDecoder())
             .eraseToAnyPublisher()
     }
-
-    // MARK: - Helpers
 
     private func setupHeaders() -> [String: String] {
         var headers: [String: String] = [:]
