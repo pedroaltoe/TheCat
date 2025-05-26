@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BreedDetailsView: View {
 
-    @ObservedObject var viewModel: BreedDetailsViewModel
+    @Bindable var viewModel: BreedDetailsViewModel
 
     var body: some View {
         ScrollView {

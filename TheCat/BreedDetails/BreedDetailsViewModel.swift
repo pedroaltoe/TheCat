@@ -1,6 +1,8 @@
+import Observation
 import SwiftUI
 
-final class BreedDetailsViewModel: ObservableObject {
+@Observable
+final class BreedDetailsViewModel {
 
     var breed: Breed
 
