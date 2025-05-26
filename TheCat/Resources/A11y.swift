@@ -1,9 +1,9 @@
 enum A11y {
     enum Breeds {
-        static var favorite = "Cat breed favorite"
-        static var image = "Cat breed image"
-        static var list = "Cat breed list"
-        static var refreshButton = "Refresh screen button"
+        static let favorite = "Cat breed favorite"
+        static let image = "Cat breed image"
+        static let list = "Cat breed list"
+        static let refreshButton = "Refresh screen button"
 
         static func name(_ name: String) -> String {
             "Cat breed name \(name)"
@@ -11,7 +11,7 @@ enum A11y {
     }
 
     enum Details {
-        static var image = "Cat image"
+        static let image = "Cat image"
 
         static func origin(_ origin: String) -> String {
             "Cat origin \(origin)"
@@ -25,6 +25,6 @@ enum A11y {
             "Cat description \(description)"
         }
 
-        static var addToFavouritesButton = "Add to favourites button"
+        static let addToFavouritesButton = "Add to favourites button"
     }
 }

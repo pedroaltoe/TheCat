@@ -44,6 +44,7 @@ struct CacheAsyncImage<Content>: View where Content: View {
     }
 }
 
+@MainActor
 fileprivate class ImageCache {
     static private var cache: [URL?: Image] = [:]
 
