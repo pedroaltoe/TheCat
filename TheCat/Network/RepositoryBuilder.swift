@@ -4,9 +4,9 @@ struct RepositoryBuilder {
     static func makeRepository(api: APIClientProtocol)
     -> Repository {
         Repository { page in
-            api.fetchBreeds(page)
+            try await api.fetchBreeds(page)
         } fetchFavourites: {
-            api.fetchFavourites()
+            try await api.fetchFavourites()
         }
 
     }

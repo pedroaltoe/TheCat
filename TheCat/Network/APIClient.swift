@@ -4,8 +4,8 @@ import struct Combine.Just
 import Foundation
 
 protocol APIClientProtocol {
-    func fetchBreeds(_ page: Int) -> AnyPublisher<[Breed], Error>
-    func fetchFavourites() -> AnyPublisher<[Breed], Error>
+    func fetchBreeds(_ page: Int) async throws -> [Breed]
+    func fetchFavourites()  async throws -> [Breed]
 }
 
 enum APIEndpoint {
@@ -24,18 +24,16 @@ enum APIEndpoint {
 
 final class APIClient: APIClientProtocol {
     
-    func fetchBreeds(_ page: Int) -> AnyPublisher<[Breed], Error> {
-        fetch(from: .getBreeds(page: page))
+    func fetchBreeds(_ page: Int)  async throws -> [Breed] {
+        return try await fetch(.getBreeds(page: page))
     }
 
-    func fetchFavourites() -> AnyPublisher<[Breed], Error> {
-        fetch(from: .getFavourites)
+    func fetchFavourites() async throws -> [Breed] {
+        return try await fetch(.getFavourites)
     }
 
-    // MARK: - Helpers
-
-    private func fetch(from endpoint: APIEndpoint) -> AnyPublisher<[Breed], Error> {
-        var url: URL?
+    private func fetch(_ endpoint: APIEndpoint) async throws -> [Breed] {
+        let url: URL?
         switch endpoint {
         case let .getBreeds(page):
             url = URL(string: APIEndpoint.getBreeds(page: page).url)
@@ -44,24 +42,29 @@ final class APIClient: APIClientProtocol {
         }
 
         guard let url else {
-            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+            throw URLError(.badURL)
         }
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = setupHeaders()
 
-        return URLSession.shared
-            .dataTaskPublisher(for: request)
-            .receive(on: DispatchQueue.main)
-            .tryMap() { element -> Data in
-                guard let httpResponse = element.response as? HTTPURLResponse,
-                      httpResponse.statusCode == 200 else {
-                    throw URLError(.badServerResponse)
-                }
-                return element.data
-            }
-            .decode(type: [Breed].self, decoder: JSONDecoder())
-            .eraseToAnyPublisher()
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard
+            let response = response as? HTTPURLResponse,
+            response.statusCode == 200 else
+        {
+            throw URLError(.badServerResponse)
+        }
+
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode([Breed].self, from: data)
+        } catch {
+            throw URLError(.cannotDecodeRawData)
+        }
     }
+
+    // MARK: - Helpers
 
     private func setupHeaders() -> [String: String] {
         var headers: [String: String] = [:]
@@ -86,26 +89,20 @@ struct APIClientMock: APIClientProtocol {
     
     var shouldReturnError = false
 
-    func fetchBreeds(_ page: Int) -> AnyPublisher<[Breed], Error> {
+    func fetchBreeds(_ page: Int) async throws -> [Breed] {
         if shouldReturnError {
-            return Fail(error: APIClientMock.MockError.failure)
-                .eraseToAnyPublisher()
+            throw MockError.failure
         }
-        
-        return Just(Breed.mockBreeds)
-            .setFailureType(to: Error.self)
-            .eraseToAnyPublisher()
+
+        return Breed.mockBreeds
     }
 
-    func fetchFavourites() -> AnyPublisher<[Breed], Error> {
+    func fetchFavourites() async throws -> [Breed] {
         if shouldReturnError {
-            return Fail(error: APIClientMock.MockError.failure)
-                .eraseToAnyPublisher()
+            throw MockError.failure
         }
 
-        return Just(Breed.mockBreeds)
-            .setFailureType(to: Error.self)
-            .eraseToAnyPublisher()
+        return Breed.mockBreeds
     }
 }
 #endif
