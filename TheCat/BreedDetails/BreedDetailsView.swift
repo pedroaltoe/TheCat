@@ -68,6 +68,8 @@ struct BreedDetailsView: View {
     }
 }
 
+#if targetEnvironment(simulator)
 #Preview {
     BreedDetailsView(viewModel: BreedDetailsViewModel(breed: Breed.mockBreeds[0]))
 }
+#endif
