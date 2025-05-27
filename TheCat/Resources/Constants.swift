@@ -13,12 +13,13 @@ enum Constants {
         enum Size {
             static let profile: CGFloat = 200
             static let breed: CGFloat = 100
+            static let favorite: CGFloat = 44
         }
 
         static let catsList = "square.grid.3x3.fill"
         static let fail = "photo.badge.exclamationmark"
         static let favorite = "star.fill"
-        static let favourites = "square.grid.3x3.fill"
+        static let favorites = "square.grid.3x3.fill"
         static let placeHolder = "photo"
         static let notFavorite = "star"
     }
