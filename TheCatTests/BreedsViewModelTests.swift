@@ -1,102 +1,49 @@
-import Combine
 @testable import TheCat
 import XCTest
 
-class MyViewModelTests: XCTestCase {
+final class MyViewModelTests: XCTestCase {
 
-    var viewModel: BreedsViewModel!
-    var mockRepository: Repository!
-    var cancellables: Set<AnyCancellable>!
-
-    override func setUp() {
-        super.setUp()
-        mockRepository = Repository.mock()
-        viewModel = BreedsViewModel(repository: mockRepository)
-        cancellables = []
-    }
-
-    override func tearDown() {
-        viewModel = nil
-        mockRepository = nil
-        cancellables = nil
-        super.tearDown()
-    }
-
-    @MainActor func testFetchBreedsFailure() {
+    @MainActor
+    func testFetchBreedsFailure() async {
         // given
-        let expectation = expectation(description: "Wait for main thread sink")
-        var expectedViewState: BreedsViewState?
+        let viewModel = await makeViewModel(makeFailureRepositoryMock())
 
         // when
-        viewModel.$viewState
-            .dropFirst()
-            .sink {
-                expectedViewState = $0
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-
-        viewModel.fetchBreeds()
-
-        wait(for: [expectation], timeout: 1.0)
+        await viewModel.fetchBreeds()
 
         // then
-        guard case .error = expectedViewState else {
+        guard case .error = viewModel.viewState else {
             XCTFail("Expected viewState to be '.error'!")
             return
         }
     }
 
-    @MainActor func testFetchBreedsSuccess() {
+    @MainActor
+    func testFetchBreedsSuccess() async {
         // given
-        let expectation = expectation(description: "Wait for main thread sink")
-        expectation.expectedFulfillmentCount = 2
-        var expectedViewState: BreedsViewState?
-        let viewModel = makeViewModelWithSuccessRepository()
+        let viewModel = await makeViewModel()
 
         // when
-        viewModel.$viewState
-            .dropFirst()
-            .sink {
-                expectedViewState = $0
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-        
-        viewModel.fetchBreeds()
-
-        wait(for: [expectation], timeout: 1.0)
+        await viewModel.fetchBreeds()
 
         // then
-        guard case .present = expectedViewState else {
+        guard case .present = viewModel.viewState else {
             XCTFail("Expected viewState to be '.present'!")
             return
         }
     }
 
-    @MainActor func testFilterBreeds() {
+    @MainActor
+    func testFilterBreeds() async {
         // given
-        let expectation = expectation(description: "Wait for main thread sink")
-        expectation.expectedFulfillmentCount = 3
-        var expectedViewState: BreedsViewState?
-        let viewModel = makeViewModelWithSuccessRepository()
+        let viewModel = await makeViewModel()
 
         // when
-        viewModel.$viewState
-            .dropFirst()
-            .sink {
-                expectedViewState = $0
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-
-        viewModel.fetchBreeds()
+        await viewModel.fetchBreeds()
         viewModel.searchText = "ae"
 
-        wait(for: [expectation], timeout: 1.0)
-
         // then
-        guard case let .present(breeds) = expectedViewState else {
+        guard case let .present(breeds) = viewModel.viewState else {
             XCTFail("Expected viewState to be '.present'!")
             return
         }
@@ -106,12 +53,12 @@ class MyViewModelTests: XCTestCase {
 
     // MARK: Helpers
 
-    private func makeViewModelWithSuccessRepository() -> BreedsViewModel {
-        let successRepository = Repository.mock { _ in 
-            Just(Breed.mockBreeds).setFailureType(to: Error.self)
-                .eraseToAnyPublisher()
-        }
+    @MainActor
+    private func makeViewModel(_ repository: RepositoryProtocol = RepositoryMock()) async -> BreedsViewModel {
+        return BreedsViewModel(repository: repository)
+    }
 
-        return BreedsViewModel(repository: successRepository)
+    private func makeFailureRepositoryMock() -> RepositoryMock {
+        RepositoryMock(shouldReturnError: true)
     }
 }
