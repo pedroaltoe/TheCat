@@ -54,8 +54,8 @@ struct BreedDetailsView: View {
                     .resizable()
                     .scaledToFill()
                     .frame(
-                        width: Constants.Image.profileSize,
-                        height: Constants.Image.profileSize
+                        width: Constants.Image.Size.profileSide,
+                        height: Constants.Image.Size.profileSide
                     )
                     .clipShape(
                         .rect(cornerRadius: 5)

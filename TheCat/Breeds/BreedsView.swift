@@ -118,8 +118,8 @@ struct BreedsView: View {
                     .resizable()
                     .scaledToFill()
                     .frame(
-                        width: Constants.Image.size,
-                        height: Constants.Image.size
+                        width: Constants.Image.Size.side,
+                        height: Constants.Image.Size.side
                     )
                     .clipShape(
                         .rect(cornerRadius: 5)
@@ -130,8 +130,8 @@ struct BreedsView: View {
             }
         }
         .frame(
-            width: Constants.Image.size,
-            height: Constants.Image.size
+            width: Constants.Image.Size.side,
+            height: Constants.Image.Size.side
         )
     }
 }
