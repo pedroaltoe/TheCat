@@ -10,13 +10,17 @@ enum Space {
 
 enum Constants {
     enum Image {
-        static let size: CGFloat = 100
-        static let profileSize: CGFloat = 200
-        static let placeHolder = "photo"
+        enum Size {
+            static let profileSide: CGFloat = 200
+            static let side: CGFloat = 100
+        }
+
+        static let catsList = "square.grid.3x3.fill"
         static let fail = "photo.badge.exclamationmark"
         static let favorite = "star.fill"
-        static let catsList = "square.grid.3x3.fill"
         static let favourites = "square.grid.3x3.fill"
+        static let placeHolder = "photo"
+        static let notFavorite = "star"
     }
 
     enum Item {
