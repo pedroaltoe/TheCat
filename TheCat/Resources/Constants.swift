@@ -11,8 +11,8 @@ enum Space {
 enum Constants {
     enum Image {
         enum Size {
-            static let profileSide: CGFloat = 200
-            static let side: CGFloat = 100
+            static let profile: CGFloat = 200
+            static let breed: CGFloat = 100
         }
 
         static let catsList = "square.grid.3x3.fill"
