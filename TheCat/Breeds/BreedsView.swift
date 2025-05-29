@@ -84,12 +84,9 @@ struct BreedsView: View {
                     .accessibilityLabel(A11y.Breeds.image)
                     .accessibilityIdentifier("Cat breed image")
 
-                if breed.isFavorite == true {
-                    Image(systemName: Constants.Image.favorite)
-                        .renderingMode(.original)
-                        .accessibilityLabel(A11y.Breeds.favorite)
-                        .accessibilityIdentifier("Cat breed favorite")
-                }
+                breed.isFavorite == true
+                ? favouriteButton(breed, Constants.Image.favorite)
+                : favouriteButton(breed, Constants.Image.notFavorite)
             }
 
             Text(breed.name)
@@ -133,6 +130,18 @@ struct BreedsView: View {
             width: Constants.Image.Size.breed,
             height: Constants.Image.Size.breed
         )
+    }
+
+    @ViewBuilder func favouriteButton(_ breed: Breed, _ image: String) -> some View {
+        Button {
+            viewModel.toggleFavorite(breed)
+        } label: {
+            Image(systemName: image)
+                .renderingMode(.original)
+                .font(.title).fontWeight(.bold)
+                .accessibilityLabel(A11y.Breeds.favorite)
+                .accessibilityIdentifier("Cat breed \(image == Constants.Image.notFavorite ? "not " : "")favorite")
+        }
     }
 }
 
