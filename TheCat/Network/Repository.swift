@@ -5,7 +5,8 @@ import Foundation
 
 protocol RepositoryProtocol {
     var fetchBreeds: (_ page: Int) async throws -> [Breed] { get }
-    var fetchFavourites: () async throws -> [Breed] { get }
+    var fetchFavorites: () async throws -> [Favorite] { get }
+    var postFavorite: (_ favorite: Favorite) async throws -> FavoriteResponse { get }
 }
 
 enum RepositoryError: Error {
@@ -14,14 +15,17 @@ enum RepositoryError: Error {
 
 struct Repository: RepositoryProtocol {
     var fetchBreeds: (_ page: Int) async throws -> [Breed]
-    var fetchFavourites: () async throws -> [Breed]
+    var fetchFavorites: () async throws -> [Favorite]
+    var postFavorite: (_ favorite: Favorite) async throws -> FavoriteResponse
 
     init(
         fetchBreeds: @escaping (_ page: Int) async throws -> [Breed],
-        fetchFavourites: @escaping () async throws -> [Breed]
+        fetchFavorites: @escaping () async throws -> [Favorite],
+        postFavorite: @escaping (_ favorite: Favorite) async throws -> FavoriteResponse
     ) {
         self.fetchBreeds = fetchBreeds
-        self.fetchFavourites = fetchFavourites
+        self.fetchFavorites = fetchFavorites
+        self.postFavorite = postFavorite
     }
 }
 
@@ -37,8 +41,12 @@ struct RepositoryMock: RepositoryProtocol {
         return mockFetchBreeds(_:)
     }
 
-    var fetchFavourites: () async throws -> [Breed] {
-        return mockFetchFavourites
+    var fetchFavorites: () async throws -> [Favorite] {
+        return mockFetchFavorites
+    }
+
+    var postFavorite: (Favorite) async throws -> FavoriteResponse {
+        return mockPostFavorite(_:)
     }
 
     // MARK: Helpers
@@ -51,12 +59,20 @@ struct RepositoryMock: RepositoryProtocol {
         return Breed.mockBreeds
     }
 
-    private func mockFetchFavourites() async throws -> [Breed] {
+    private func mockFetchFavorites() async throws -> [Favorite] {
         if shouldReturnError {
             throw MockError.failure
         }
 
-        return Breed.mockBreeds
+        return Favorite.mockFavorites
+    }
+
+    private func mockPostFavorite(_ favorite: Favorite) async throws -> FavoriteResponse {
+        if shouldReturnError {
+            throw MockError.failure
+        }
+
+        return FavoriteResponse.mockSuccessResponse
     }
 }
 #endif

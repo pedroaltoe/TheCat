@@ -5,22 +5,22 @@ import Foundation
 
 protocol APIClientProtocol {
     func fetchBreeds(_ page: Int) async throws -> [Breed]
-    func fetchFavourites()  async throws -> [Favorite]
-    func postFavourites(_ favorite: Favorite)  async throws -> FavoriteResponse
+    func fetchFavorites()  async throws -> [Favorite]
+    func postFavorite(_ favorite: Favorite)  async throws -> FavoriteResponse
 }
 
 enum APIEndpoint {
     private static let baseURL = "https://api.thecatapi.com/v1"
 
     case getBreeds(page: Int)
-    case getFavourites
-    case postFavorites(imageId: String)
+    case getFavorites
+    case postFavorite(imageId: String)
 
     var url: String {
         switch self {
         case let .getBreeds(page): return "\(Self.baseURL)/breeds?limit=15&page=\(page)"
-        case .getFavourites: return "\(Self.baseURL)/favourites"
-        case let .postFavorites(imageId): return "\(Self.baseURL)/favourites"
+        case .getFavorites: return "\(Self.baseURL)/favourites"
+        case .postFavorite: return "\(Self.baseURL)/favourites"
         }
     }
 }
@@ -37,8 +37,8 @@ final class APIClient: APIClientProtocol {
         return try await fetch(.getBreeds(page: page))
     }
 
-    func fetchFavourites() async throws -> [Favorite] {
-        return try await fetch(.getFavourites)
+    func fetchFavorites() async throws -> [Favorite] {
+        return try await fetch(.getFavorites)
     }
 
     private func fetch<T: Decodable>(_ endpoint: APIEndpoint) async throws -> [T] {
@@ -46,8 +46,8 @@ final class APIClient: APIClientProtocol {
         switch endpoint {
         case let .getBreeds(page):
             url = URL(string: APIEndpoint.getBreeds(page: page).url)
-        case .getFavourites:
-            url = URL(string: APIEndpoint.getFavourites.url)
+        case .getFavorites:
+            url = URL(string: APIEndpoint.getFavorites.url)
         default: break
         }
 
@@ -77,8 +77,8 @@ final class APIClient: APIClientProtocol {
 
     // MARK: POST
 
-    func postFavourites(_ favorite: Favorite)  async throws -> FavoriteResponse {
-        guard let url = URL(string: APIEndpoint.postFavorites(imageId: "").url) else {
+    func postFavorite(_ favorite: Favorite)  async throws -> FavoriteResponse {
+        guard let url = URL(string: APIEndpoint.postFavorite(imageId: "").url) else {
             throw URLError(.badURL)
         }
 
@@ -140,7 +140,7 @@ struct APIClientMock: APIClientProtocol {
         return Breed.mockBreeds
     }
 
-    func fetchFavourites() async throws -> [Favorite] {
+    func fetchFavorites() async throws -> [Favorite] {
         if shouldReturnError {
             throw MockError.failure
         }
@@ -148,7 +148,7 @@ struct APIClientMock: APIClientProtocol {
         return Favorite.mockFavorites
     }
 
-    func postFavourites(_ favorite: Favorite)  async throws -> FavoriteResponse {
+    func postFavorite(_ favorite: Favorite)  async throws -> FavoriteResponse {
         if shouldReturnError {
             throw MockError.failure
         }

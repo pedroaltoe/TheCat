@@ -5,9 +5,10 @@ struct RepositoryBuilder {
     -> Repository {
         Repository { page in
             try await api.fetchBreeds(page)
-        } fetchFavourites: {
-            try await api.fetchFavourites()
+        } fetchFavorites: {
+            try await api.fetchFavorites()
+        } postFavorite: { favorite in
+            try await api.postFavorite(favorite)
         }
-
     }
 }
