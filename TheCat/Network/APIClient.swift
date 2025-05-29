@@ -5,7 +5,8 @@ import Foundation
 
 protocol APIClientProtocol {
     func fetchBreeds(_ page: Int) async throws -> [Breed]
-    func fetchFavourites()  async throws -> [Breed]
+    func fetchFavourites()  async throws -> [Favorite]
+    func postFavourites(_ favorite: Favorite)  async throws -> FavoriteResponse
 }
 
 enum APIEndpoint {
@@ -13,32 +14,41 @@ enum APIEndpoint {
 
     case getBreeds(page: Int)
     case getFavourites
+    case postFavorites(imageId: String)
 
     var url: String {
         switch self {
         case let .getBreeds(page): return "\(Self.baseURL)/breeds?limit=15&page=\(page)"
         case .getFavourites: return "\(Self.baseURL)/favourites"
+        case let .postFavorites(imageId): return "\(Self.baseURL)/favourites"
         }
     }
 }
 
+enum HttpMethod: String {
+    case post = "POST"
+}
+
 final class APIClient: APIClientProtocol {
-    
+
+    // MARK: GET
+
     func fetchBreeds(_ page: Int)  async throws -> [Breed] {
         return try await fetch(.getBreeds(page: page))
     }
 
-    func fetchFavourites() async throws -> [Breed] {
+    func fetchFavourites() async throws -> [Favorite] {
         return try await fetch(.getFavourites)
     }
 
-    private func fetch(_ endpoint: APIEndpoint) async throws -> [Breed] {
-        let url: URL?
+    private func fetch<T: Decodable>(_ endpoint: APIEndpoint) async throws -> [T] {
+        var url = URL(string: "")
         switch endpoint {
         case let .getBreeds(page):
             url = URL(string: APIEndpoint.getBreeds(page: page).url)
         case .getFavourites:
             url = URL(string: APIEndpoint.getFavourites.url)
+        default: break
         }
 
         guard let url else {
@@ -58,7 +68,40 @@ final class APIClient: APIClientProtocol {
 
         do {
             let decoder = JSONDecoder()
-            return try decoder.decode([Breed].self, from: data)
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            return try decoder.decode([T].self, from: data)
+        } catch {
+            throw URLError(.cannotDecodeRawData)
+        }
+    }
+
+    // MARK: POST
+
+    func postFavourites(_ favorite: Favorite)  async throws -> FavoriteResponse {
+        guard let url = URL(string: APIEndpoint.postFavorites(imageId: "").url) else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = HttpMethod.post.rawValue
+        request.allHTTPHeaderFields = setupHeaders()
+
+        let jsonData = try JSONEncoder().encode(favorite)
+        request.httpBody = jsonData
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard
+            let response = response as? HTTPURLResponse,
+            response.statusCode == 200 else
+        {
+            throw URLError(.badServerResponse)
+        }
+
+        do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            return try decoder.decode(FavoriteResponse.self, from: data)
         } catch {
             throw URLError(.cannotDecodeRawData)
         }
@@ -97,12 +140,20 @@ struct APIClientMock: APIClientProtocol {
         return Breed.mockBreeds
     }
 
-    func fetchFavourites() async throws -> [Breed] {
+    func fetchFavourites() async throws -> [Favorite] {
         if shouldReturnError {
             throw MockError.failure
         }
 
-        return Breed.mockBreeds
+        return Favorite.mockFavorites
+    }
+
+    func postFavourites(_ favorite: Favorite)  async throws -> FavoriteResponse {
+        if shouldReturnError {
+            throw MockError.failure
+        }
+
+        return FavoriteResponse.mockSuccessResponse
     }
 }
 #endif
