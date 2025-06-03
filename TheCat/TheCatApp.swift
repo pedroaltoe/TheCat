@@ -3,14 +3,14 @@ import SwiftUI
 @main
 struct TheCatApp: App {
 
+    @State private var coordinator = Coordinator()
+
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                TabView {
-                    BreedsView(viewModel: BreedsViewModel())
-                        .tabItem {
-                            Label(Localized.Breeds.catsListButton, systemImage: Constants.Image.catsList)
-                        }
+            NavigationStack(path: $coordinator.path) {
+                coordinator.build(screen: .contentView)
+                    .navigationDestination(for: Coordinator.Route.self) { screen in
+                    coordinator.build(screen: screen)
                 }
                 .navigationTitle(Localized.Breeds.title)
             }
