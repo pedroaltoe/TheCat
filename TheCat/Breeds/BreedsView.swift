@@ -4,8 +4,6 @@ struct BreedsView: View {
 
     @Bindable var viewModel: BreedsViewModel
 
-    @State private var isShowingDetailView = false
-
     let columns = [
         GridItem(.adaptive(minimum: Constants.Item.size))
     ]
@@ -55,16 +53,12 @@ struct BreedsView: View {
 
     // MARK: Content
 
-    @ViewBuilder func contentView(_ breeds: [Breed]) -> some View {
+    @ViewBuilder func contentView(_ breeds: [BreedDisplayModel]) -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: Space.large) {
                 ForEach(breeds) { breed in
-                    NavigationLink {
-                        BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
-                    } label: {
-                        item(breed)
-                            .tint(.primary)
-                    }
+                    item(breed)
+                        .tint(.primary)
                 }
             }
             .padding()
@@ -77,7 +71,7 @@ struct BreedsView: View {
         )
     }
 
-    @ViewBuilder func item(_ breed: Breed) -> some View {
+    @ViewBuilder func item(_ breed: BreedDisplayModel) -> some View {
         VStack(spacing: Space.small) {
             ZStack(alignment: .topTrailing) {
                 breedImage(breed)
@@ -85,8 +79,8 @@ struct BreedsView: View {
                     .accessibilityIdentifier("Cat breed image")
 
                 breed.isFavorite == true
-                ? favouriteButton(breed, Constants.Image.favorite)
-                : favouriteButton(breed, Constants.Image.notFavorite)
+                ? favoriteButton(breed, Constants.Image.favorite)
+                : favoriteButton(breed, Constants.Image.notFavorite)
             }
 
             Text(breed.name)
@@ -101,8 +95,8 @@ struct BreedsView: View {
 
     // MARK: Image
 
-    @ViewBuilder func breedImage(_ breed: Breed) -> some View {
-        CacheAsyncImage(url: URL(string: breed.image?.url ?? "")) { phase in
+    @ViewBuilder func breedImage(_ breed: BreedDisplayModel) -> some View {
+        CacheAsyncImage(url: URL(string: breed.imageUrl ?? "")) { phase in
             switch phase {
             case .empty:
                 Image(systemName: Constants.Image.placeHolder)
@@ -132,9 +126,11 @@ struct BreedsView: View {
         )
     }
 
-    @ViewBuilder func favouriteButton(_ breed: Breed, _ image: String) -> some View {
+    @ViewBuilder func favoriteButton(_ breed: BreedDisplayModel, _ image: String) -> some View {
         Button {
-            viewModel.toggleFavorite(breed)
+            Task {
+                await viewModel.toggleFavorite(breed.id)
+            }
         } label: {
             Image(systemName: image)
                 .renderingMode(.original)
@@ -147,6 +143,7 @@ struct BreedsView: View {
 
 #if targetEnvironment(simulator)
 #Preview {
-    BreedsView(viewModel: BreedsViewModel())
+    let contentViewModel = ContentViewModel(repository: RepositoryBuilder.makeRepository(api: APIClientMock()))
+    BreedsView(viewModel: BreedsViewModel(contentViewModel: contentViewModel))
 }
 #endif
