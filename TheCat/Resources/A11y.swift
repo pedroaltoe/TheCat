@@ -10,6 +10,17 @@ enum A11y {
         }
     }
 
+    enum Favorites {
+        static let emptyImage = "star.slash"
+        static let emptyTitle = "Favorites list is empty"
+        static let image = "Cat favorite image"
+        static let list = "Cat favorites list"
+
+        static func lifeSpan(_ lifeSpan: String) -> String {
+            "Cat breed life span \(lifeSpan)"
+        }
+    }
+
     enum Details {
         static let image = "Cat image"
 
