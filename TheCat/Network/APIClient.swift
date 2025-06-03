@@ -6,7 +6,7 @@ import Foundation
 protocol APIClientProtocol {
     func fetchBreeds(_ page: Int) async throws -> [Breed]
     func fetchFavorites()  async throws -> [Favorite]
-    func postFavorite(_ favorite: Favorite)  async throws -> FavoriteResponse
+    func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse
 }
 
 enum APIEndpoint {
@@ -77,7 +77,7 @@ final class APIClient: APIClientProtocol {
 
     // MARK: POST
 
-    func postFavorite(_ favorite: Favorite)  async throws -> FavoriteResponse {
+    func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse {
         guard let url = URL(string: APIEndpoint.postFavorite(imageId: "").url) else {
             throw URLError(.badURL)
         }
@@ -86,7 +86,9 @@ final class APIClient: APIClientProtocol {
         request.httpMethod = HttpMethod.post.rawValue
         request.allHTTPHeaderFields = setupHeaders()
 
-        let jsonData = try JSONEncoder().encode(favorite)
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        let jsonData = try encoder.encode(favoritePost)
         request.httpBody = jsonData
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -148,7 +150,7 @@ struct APIClientMock: APIClientProtocol {
         return Favorite.mockFavorites
     }
 
-    func postFavorite(_ favorite: Favorite)  async throws -> FavoriteResponse {
+    func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse {
         if shouldReturnError {
             throw MockError.failure
         }

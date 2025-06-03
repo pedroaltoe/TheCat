@@ -6,7 +6,7 @@ import Foundation
 protocol RepositoryProtocol {
     var fetchBreeds: (_ page: Int) async throws -> [Breed] { get }
     var fetchFavorites: () async throws -> [Favorite] { get }
-    var postFavorite: (_ favorite: Favorite) async throws -> FavoriteResponse { get }
+    var postFavorite: (_ favoritePost: FavoritePost) async throws -> FavoriteResponse { get }
 }
 
 enum RepositoryError: Error {
@@ -16,12 +16,12 @@ enum RepositoryError: Error {
 struct Repository: RepositoryProtocol {
     var fetchBreeds: (_ page: Int) async throws -> [Breed]
     var fetchFavorites: () async throws -> [Favorite]
-    var postFavorite: (_ favorite: Favorite) async throws -> FavoriteResponse
+    var postFavorite: (_ favoritePost: FavoritePost) async throws -> FavoriteResponse
 
     init(
         fetchBreeds: @escaping (_ page: Int) async throws -> [Breed],
         fetchFavorites: @escaping () async throws -> [Favorite],
-        postFavorite: @escaping (_ favorite: Favorite) async throws -> FavoriteResponse
+        postFavorite: @escaping (_ favoritePost: FavoritePost) async throws -> FavoriteResponse
     ) {
         self.fetchBreeds = fetchBreeds
         self.fetchFavorites = fetchFavorites
@@ -45,7 +45,7 @@ struct RepositoryMock: RepositoryProtocol {
         return mockFetchFavorites
     }
 
-    var postFavorite: (Favorite) async throws -> FavoriteResponse {
+    var postFavorite: (FavoritePost) async throws -> FavoriteResponse {
         return mockPostFavorite(_:)
     }
 
@@ -67,7 +67,7 @@ struct RepositoryMock: RepositoryProtocol {
         return Favorite.mockFavorites
     }
 
-    private func mockPostFavorite(_ favorite: Favorite) async throws -> FavoriteResponse {
+    private func mockPostFavorite(_ favoritePost: FavoritePost) async throws -> FavoriteResponse {
         if shouldReturnError {
             throw MockError.failure
         }
