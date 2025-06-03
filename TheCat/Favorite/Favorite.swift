@@ -1,15 +1,20 @@
 import Foundation
 
-struct Favorite: Codable {
+struct FavoritePost: Encodable {
+    let imageId: String
+}
+
+struct Favorite: Codable, Identifiable {
     let id: Int
     let userId: String
     let imageId: String
-    let subId: String
+    let subId: String?
     let createdAt: String
-    let image: FavoriteImage
+    let image: FavoriteImage?
 }
 
 struct FavoriteImage: Codable {
+    let id: String
     let url: String
 }
 
@@ -28,6 +33,7 @@ extension Favorite {
             subId: "1234",
             createdAt: "",
             image: FavoriteImage(
+                id: "image1",
                 url: ""
             )
         ),
@@ -38,6 +44,7 @@ extension Favorite {
             subId: "1234",
             createdAt: "",
             image: FavoriteImage(
+                id: "image2",
                 url: ""
             )
         ),
@@ -48,6 +55,7 @@ extension Favorite {
             subId: "1234",
             createdAt: "",
             image: FavoriteImage(
+                id: "image3",
                 url: ""
             )
         ),
