@@ -15,34 +15,24 @@ final class BreedsViewModel {
 
     var isLoadingMore = false
 
-    private var breeds: [Breed] = []
-    private var filteredBreeds: [Breed] = []
-    private var favourites: [Breed] = []
+    private var breeds: [BreedDisplayModel] = []
+    private var filteredBreeds: [BreedDisplayModel] = []
     private var page = 0
 
-    private let repository: RepositoryProtocol
+    private let contentViewModel: ContentViewModel
 
     // MARK: Init
 
-    init(repository: RepositoryProtocol = RepositoryBuilder.makeRepository(api: APIClient())) {
+    init(contentViewModel: ContentViewModel) {
         viewState = .initial
-        self.repository = repository
+        self.contentViewModel = contentViewModel
     }
 
     // MARK: Fetch data
 
-    func fetchFavourites() async {
-        do {
-            let favourites = try await repository.fetchFavourites()
-            viewState = .present(favourites)
-        } catch {
-            viewState = .error(error.localizedDescription)
-        }
-    }
-
     func fetchBreeds(_ page: Int = 0) async {
         do {
-            let breeds = try await repository.fetchBreeds(page)
+            let breeds = try await contentViewModel.fetchBreeds(page)
 
             guard !breeds.isEmpty else {
                 isLoadingMore = false
@@ -99,6 +89,12 @@ final class BreedsViewModel {
             }
         }
 
-        viewState = .present(filteredBreeds)
+        viewState = .present(breeds)
+    }
+
+    // MARK: Helper
+
+    func toggleFavorite(_ imageId: String?) async {
+        try? await contentViewModel.toggleFavorite(imageId)
     }
 }
