@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
 
-    var viewModel: ContentViewModel
+    @Bindable var viewModel: ContentViewModel
 
     var body: some View {
         TabView {
@@ -13,11 +13,8 @@ struct ContentView: View {
 
             FavoritesView(viewModel: FavoritesViewModel(contentViewModel: viewModel))
                 .tabItem {
-                    Label(Localized.Breeds.favouritesButton, systemImage: Constants.Image.favorites)    
+                    Label(Localized.Breeds.favouritesButton, systemImage: Constants.Image.favorites)
                 }
-        }
-        .onAppear {
-            viewModel.onAppear()
         }
     }
 }
