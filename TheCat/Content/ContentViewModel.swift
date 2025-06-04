@@ -1,9 +1,15 @@
+import Combine
+import Foundation
 import Observation
-import SwiftUI
 
 @MainActor
 @Observable
 final class ContentViewModel {
+
+    private let favoritesChangedSubject = PassthroughSubject<Void, Never>()
+    var favoritesChangedPublisher: AnyPublisher<Void, Never> {
+        favoritesChangedSubject.eraseToAnyPublisher()
+    }
 
     private let repository: RepositoryProtocol
 
@@ -40,6 +46,7 @@ final class ContentViewModel {
         let favorites = try await repository.fetchFavorites()
         favoriteImageIds = Set(favorites.compactMap { $0.imageId })
         favoriteBreeds = filterFavoriteBreeds()
+        favoritesChangedSubject.send(())
     }
 
     // MARK: Helper
@@ -72,8 +79,11 @@ final class ContentViewModel {
             favoriteImageIds.remove(imageId)
         } else {
             // TODO: Handle error
-            let response = try await repository.postFavorite(favoritePost)
+            let response = try? await repository.postFavorite(favoritePost)
+            print("----- \(String(describing: response)) -----")
             favoriteImageIds.insert(imageId)
         }
+
+        try? await fetchFavorites()
     }
 }
