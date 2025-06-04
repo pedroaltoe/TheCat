@@ -3,9 +3,20 @@ import Foundation
 enum Localized {
     enum Breeds {
         static let refresh = String(localized: "Refresh")
-        static let title = String(localized: "TheCat")
+        static let title = String(localized: "Breeds list")
         static let catsListButton = String(localized: "Cats List")
         static let favouritesButton = String(localized: "Favourites")
+        static let emptyTitle = String(localized: "Breeds list is empty")
+    }
+
+    enum Favorites {
+        static let emptyTitle = String(localized:"Favorites list is empty")
+        static let title = String(localized: "Favorite list")
+
+        static func lifeSpan(_ lifeSpan: String) -> String {
+            "\(String(localized:"Lifespan:")) \(lifeSpan)"
+        }
+
     }
 
     enum Details {

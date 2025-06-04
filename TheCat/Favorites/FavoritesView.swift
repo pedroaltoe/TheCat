@@ -19,7 +19,7 @@ struct FavoritesView: View {
                 }
         case .empty:
             ContentUnavailableView(
-                A11y.Favorites.emptyTitle,
+                Localized.Favorites.emptyTitle,
                 systemImage: Constants.Image.emptyFavoritesImage
             )
         case let .present(breeds):
@@ -70,7 +70,7 @@ struct FavoritesView: View {
                     .accessibilityLabel(A11y.Breeds.name(breed.name))
                     .accessibilityIdentifier("Cat breed name")
 
-                Text(A11y.Favorites.lifeSpan(breed.lifeSpan))
+                Text(Localized.Favorites.lifeSpan(breed.lifeSpan))
                     .font(.system(size: 12))
                     .accessibilityLabel(A11y.Favorites.lifeSpan(breed.lifeSpan))
                     .accessibilityIdentifier("Cat favorite lifeSpan")

@@ -59,7 +59,7 @@ struct BreedsView: View {
         ScrollView {
             if breeds.isEmpty {
                 ContentUnavailableView(
-                    A11y.Breeds.emptyTitle,
+                    Localized.Breeds.emptyTitle,
                     systemImage: Constants.Image.placeHolder
                 )
                 .padding()
