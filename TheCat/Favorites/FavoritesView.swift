@@ -30,6 +30,8 @@ struct FavoritesView: View {
         }
     }
 
+    // MARK: Progress view
+
     @ViewBuilder var progressView: some View {
         ProgressView()
             .controlSize(.large)
@@ -109,6 +111,8 @@ struct FavoritesView: View {
         )
     }
 
+    // MARK: Favorite button
+
     @ViewBuilder func favouriteButton(imageId: String?) -> some View {
         Button {
             Task {
@@ -123,6 +127,8 @@ struct FavoritesView: View {
         }
     }
 }
+
+// MARK: Preview
 
 #if targetEnvironment(simulator)
 #Preview {

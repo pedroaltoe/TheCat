@@ -45,6 +45,8 @@ struct BreedsView: View {
         }
     }
 
+    // MARK: Progress view
+
     @ViewBuilder var progressView: some View {
         ProgressView()
             .controlSize(.large)
@@ -136,6 +138,8 @@ struct BreedsView: View {
         )
     }
 
+    // MARK: Favorite button
+
     @ViewBuilder func favoriteButton(_ breed: Breed, _ image: String) -> some View {
         Button {
             Task {
@@ -150,6 +154,8 @@ struct BreedsView: View {
         }
     }
 }
+
+// MARK: Preview
 
 #if targetEnvironment(simulator)
 #Preview {

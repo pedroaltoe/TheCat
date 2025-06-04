@@ -29,6 +29,8 @@ struct ContentView: View {
     }
 }
 
+// MARK: Preview
+
 #if targetEnvironment(simulator)
 #Preview {
     ContentView()
