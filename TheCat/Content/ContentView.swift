@@ -34,9 +34,6 @@ struct ContentView: View {
             }
             .tag(Tab.favorites)
         }
-        .navigationDestination(for: Coordinator.Route.self) { route in
-            coordinator.build(screen: route)
-        }
         .sheet(item: $coordinator.presentedBreedDetails) { breed in
             coordinator.buildBreedDetailsView(breed: breed)
         }

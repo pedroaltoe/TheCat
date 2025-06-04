@@ -54,18 +54,31 @@ class Coordinator {
     func build(screen: Route) -> some View {
         switch screen {
         case .breedsView:
-            BreedsView(viewModel: BreedsViewModel(contentViewModel: contentViewModel))
-                .navigationTitle(Localized.Breeds.title)
+            BreedsView(
+                viewModel: BreedsViewModel(
+                    contentViewModel: contentViewModel,
+                    coordinator: self
+                )
+            )
+            .navigationTitle(Localized.Breeds.title)
         case .favoritesView:
-            FavoritesView(viewModel: FavoritesViewModel(contentViewModel: contentViewModel))
-                .navigationTitle(Localized.Favorites.title)
+            FavoritesView(
+                viewModel: FavoritesViewModel(
+                    contentViewModel: contentViewModel,
+                    coordinator: self
+                )
+            )
+            .navigationTitle(Localized.Favorites.title)
         }
     }
 
     // MARK: Detail screen builder
     @ViewBuilder
     func buildBreedDetailsView(breed: Breed) -> some View {
-        BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
+        NavigationStack {
+            BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
+                .navigationTitle(breed.name)
+        }
     }
 }
 
