@@ -38,7 +38,7 @@ struct FavoritesView: View {
 
     // MARK: Content
 
-    @ViewBuilder func contentView(_ breeds: [BreedDisplayModel]) -> some View {
+    @ViewBuilder func contentView(_ breeds: [Breed]) -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: Space.large) {
                 ForEach(breeds) { breed in
@@ -52,14 +52,14 @@ struct FavoritesView: View {
         }
     }
 
-    @ViewBuilder func item(_ breed: BreedDisplayModel) -> some View {
+    @ViewBuilder func item(_ breed: Breed) -> some View {
         VStack(spacing: Space.small) {
             ZStack(alignment: .topTrailing) {
                 breedImage(breed)
                     .accessibilityLabel(A11y.Favorites.image)
                     .accessibilityIdentifier("Cat favorite image")
 
-                favouriteButton(breed.id)
+                favouriteButton(imageId: breed.referenceImageId)
             }
 
             Text(breed.lifeSpan)
@@ -71,8 +71,8 @@ struct FavoritesView: View {
 
     // MARK: Image
 
-    @ViewBuilder func breedImage(_ breed: BreedDisplayModel) -> some View {
-        CacheAsyncImage(url: URL(string: breed.imageUrl ?? "")) { phase in
+    @ViewBuilder func breedImage(_ breed: Breed) -> some View {
+        CacheAsyncImage(url: URL(string: breed.image?.url ?? "")) { phase in
             switch phase {
             case .empty:
                 Image(systemName: Constants.Image.placeHolder)
@@ -102,10 +102,10 @@ struct FavoritesView: View {
         )
     }
 
-    @ViewBuilder func favouriteButton(_ breedId: String) -> some View {
+    @ViewBuilder func favouriteButton(imageId: String?) -> some View {
         Button {
             Task {
-                await viewModel.toggleFavorite(breedId)
+                await viewModel.toggleFavorite(imageId: imageId)
             }
         } label: {
             Image(systemName: Constants.Image.favorite)

@@ -12,7 +12,7 @@ final class FavoritesViewModel {
     private var cancellables = Set<AnyCancellable>()
 
     var isLoading = false
-    var favoriteBreeds: [BreedDisplayModel] = []
+    var favoriteBreeds: [Breed] = []
 
     // MARK: Init
 
@@ -48,8 +48,8 @@ final class FavoritesViewModel {
 
     // MARK: Helper
 
-    func toggleFavorite(_ breedId: String) async {
-        try? await contentViewModel.toggleFavorite(breedId)
+    func toggleFavorite(imageId: String?) async {
+        try? await contentViewModel.toggleFavorite(imageId: imageId)
     }
 
     private func updateBreedFavoriteStatus() {

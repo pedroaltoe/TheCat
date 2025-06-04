@@ -20,8 +20,8 @@ final class BreedsViewModel {
 
     var isLoadingMore = false
 
-    private var breeds: [BreedDisplayModel] = []
-    private var filteredBreeds: [BreedDisplayModel] = []
+    private var breeds: [Breed] = []
+    private var filteredBreeds: [Breed] = []
     private var page = 0
 
     private let contentViewModel: ContentViewModel
@@ -133,12 +133,12 @@ final class BreedsViewModel {
 
     // MARK: Helper
 
-    func toggleFavorite(_ breedId: String) async {
-        try? await contentViewModel.toggleFavorite(breedId)
+    func toggleFavorite(imageId: String?) async {
+        try? await contentViewModel.toggleFavorite(imageId: imageId)
     }
 
-    func isBreedFavorite(_ breedId: String) -> Bool {
-        return contentViewModel.isFavorite(breedId)
+    func isBreedFavorite(imageId: String?) -> Bool {
+        return contentViewModel.isFavorite(imageId: imageId)
     }
 
     private func updateBreedFavoriteStatus() {

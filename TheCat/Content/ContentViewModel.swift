@@ -13,10 +13,10 @@ final class ContentViewModel {
 
     private let repository: RepositoryProtocol
 
-    var allBreeds: [BreedDisplayModel] = []
-    var filteredBreeds: [BreedDisplayModel] = []
+    var allBreeds: [Breed] = []
+    var filteredBreeds: [Breed] = []
     var favoriteImageIds: Set<String> = []
-    var favoriteBreeds: [BreedDisplayModel] = []
+    var favoriteBreeds: [Breed] = []
 
     // MARK: Init
 
@@ -26,20 +26,18 @@ final class ContentViewModel {
 
     // MARK: Fetch data
 
-    func fetchBreeds(_ page: Int) async throws -> [BreedDisplayModel] {
+    func fetchBreeds(_ page: Int) async throws -> [Breed] {
         try? await fetchFavorites()
         
         let breeds = try await repository.fetchBreeds(page)
-        let displayModel = makeDisplayModel(from: breeds)
-        allBreeds.append(contentsOf: displayModel)
-        return displayModel
+        allBreeds.append(contentsOf: breeds)
+        return breeds
     }
 
-    func searchBreeds(_ query: String) async throws -> [BreedDisplayModel] {
+    func searchBreeds(_ query: String) async throws -> [Breed] {
         let breeds = try await repository.searchBreeds(query)
-        let displayModel = makeDisplayModel(from: breeds)
-        filteredBreeds.append(contentsOf: displayModel)
-        return displayModel
+        filteredBreeds.append(contentsOf: breeds)
+        return breeds
     }
 
     func fetchFavorites() async throws {
@@ -51,36 +49,27 @@ final class ContentViewModel {
 
     // MARK: Helper
 
-    private func makeDisplayModel(from breeds: [Breed]) -> [BreedDisplayModel] {
-        breeds.map {
-            BreedDisplayModel(
-                id: $0.referenceImageId ?? "\($0.id)",
-                name: $0.name,
-                imageUrl: $0.image?.url,
-                lifeSpan: $0.lifeSpan
-            )
-        }
+    func filterFavoriteBreeds() -> [Breed] {
+        allBreeds.filter { isFavorite(imageId: $0.referenceImageId) }
     }
 
-    func filterFavoriteBreeds() -> [BreedDisplayModel] {
-        allBreeds.filter { isFavorite($0.id) }
+    func isFavorite(imageId: String?) -> Bool {
+        guard let imageId else { return false }
+        return favoriteImageIds.contains(imageId)
     }
 
-    func isFavorite(_ breedId: String) -> Bool {
-        return favoriteImageIds.contains(breedId)
-    }
+    func toggleFavorite(imageId: String?) async throws {
+        guard let imageId else { return }
+        let favoritePost = FavoritePost(imageId: imageId)
 
-    func toggleFavorite(_ breedId: String) async throws {
-        let favoritePost = FavoritePost(imageId: breedId)
-
-        if isFavorite(breedId) {
+        if isFavorite(imageId: imageId) {
 //            try await api.unfavorite(imageId)
-            favoriteImageIds.remove(breedId)
+            favoriteImageIds.remove(imageId)
         } else {
             // TODO: Handle error
             let response = try? await repository.postFavorite(favoritePost)
             print("----- \(String(describing: response)) -----")
-            favoriteImageIds.insert(breedId)
+            favoriteImageIds.insert(imageId)
         }
 
         try? await fetchFavorites()

@@ -53,7 +53,7 @@ struct BreedsView: View {
 
     // MARK: Content
 
-    @ViewBuilder func contentView(_ breeds: [BreedDisplayModel]) -> some View {
+    @ViewBuilder func contentView(_ breeds: [Breed]) -> some View {
         ScrollView {
             if breeds.isEmpty {
                 ContentUnavailableView(
@@ -81,14 +81,14 @@ struct BreedsView: View {
         )
     }
 
-    @ViewBuilder func item(_ breed: BreedDisplayModel) -> some View {
+    @ViewBuilder func item(_ breed: Breed) -> some View {
         VStack(spacing: Space.small) {
             ZStack(alignment: .topTrailing) {
                 breedImage(breed)
                     .accessibilityLabel(A11y.Breeds.image)
                     .accessibilityIdentifier("Cat breed image")
 
-                viewModel.isBreedFavorite(breed.id)
+                viewModel.isBreedFavorite(imageId: breed.referenceImageId)
                 ? favoriteButton(breed, Constants.Image.favorite)
                 : favoriteButton(breed, Constants.Image.notFavorite)
             }
@@ -105,8 +105,8 @@ struct BreedsView: View {
 
     // MARK: Image
 
-    @ViewBuilder func breedImage(_ breed: BreedDisplayModel) -> some View {
-        CacheAsyncImage(url: URL(string: breed.imageUrl ?? "")) { phase in
+    @ViewBuilder func breedImage(_ breed: Breed) -> some View {
+        CacheAsyncImage(url: URL(string: breed.image?.url ?? "")) { phase in
             switch phase {
             case .empty:
                 Image(systemName: Constants.Image.placeHolder)
@@ -136,10 +136,10 @@ struct BreedsView: View {
         )
     }
 
-    @ViewBuilder func favoriteButton(_ breed: BreedDisplayModel, _ image: String) -> some View {
+    @ViewBuilder func favoriteButton(_ breed: Breed, _ image: String) -> some View {
         Button {
             Task {
-                await viewModel.toggleFavorite(breed.id)
+                await viewModel.toggleFavorite(imageId: breed.referenceImageId)
             }
         } label: {
             Image(systemName: image)
