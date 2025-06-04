@@ -1,16 +1,26 @@
 import SwiftUI
 
+@MainActor
 @Observable
 class Coordinator {
 
     // MARK: Route
 
     enum Route: Hashable {
-        case contentView
+        case breedsView
+        case favoritesView
         case detailsView(Breed)
     }
 
+    let contentViewModel: ContentViewModel
+
     var path = NavigationPath()
+
+    init() {
+        let api = APIClient()
+        let repository = RepositoryBuilder.makeRepository(api: api)
+        contentViewModel = ContentViewModel(repository: repository)
+    }
 
     // MARK: Navigation
 
@@ -24,16 +34,17 @@ class Coordinator {
 
     // MARK: Screen builder
 
-    @MainActor
     @ViewBuilder
     func build(screen: Route) -> some View {
-        let api = APIClient()
-        let repository = RepositoryBuilder.makeRepository(api: api)
-        let contentViewModel = ContentViewModel(repository: repository)
-
         switch screen {
-        case .contentView:
-            ContentView(viewModel: contentViewModel)
+        case .breedsView:
+            BreedsView(viewModel: BreedsViewModel(contentViewModel: contentViewModel))
+                .environment(contentViewModel)
+                .navigationTitle("Breeds list")
+        case .favoritesView:
+            FavoritesView(viewModel: FavoritesViewModel(contentViewModel: contentViewModel))
+                .environment(contentViewModel)
+                .navigationTitle("Favorite list")
         case let .detailsView(breed):
             BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
         }
