@@ -102,10 +102,10 @@ struct FavoritesView: View {
         )
     }
 
-    @ViewBuilder func favouriteButton(_ imageId: String) -> some View {
+    @ViewBuilder func favouriteButton(_ breedId: String) -> some View {
         Button {
             Task {
-                await viewModel.toggleFavorite(imageId)
+                await viewModel.toggleFavorite(breedId)
             }
         } label: {
             Image(systemName: Constants.Image.favorite)

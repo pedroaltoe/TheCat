@@ -66,22 +66,21 @@ final class ContentViewModel {
         allBreeds.filter { isFavorite($0.id) }
     }
 
-    func isFavorite(_ imageId: String?) -> Bool {
-        guard let imageId else { return false }
-        return favoriteImageIds.contains(imageId)
+    func isFavorite(_ breedId: String) -> Bool {
+        return favoriteImageIds.contains(breedId)
     }
 
-    func toggleFavorite(_ imageId: String) async throws {
-        let favoritePost = FavoritePost(imageId: imageId)
+    func toggleFavorite(_ breedId: String) async throws {
+        let favoritePost = FavoritePost(imageId: breedId)
 
-        if isFavorite(imageId) {
+        if isFavorite(breedId) {
 //            try await api.unfavorite(imageId)
-            favoriteImageIds.remove(imageId)
+            favoriteImageIds.remove(breedId)
         } else {
             // TODO: Handle error
             let response = try? await repository.postFavorite(favoritePost)
             print("----- \(String(describing: response)) -----")
-            favoriteImageIds.insert(imageId)
+            favoriteImageIds.insert(breedId)
         }
 
         try? await fetchFavorites()

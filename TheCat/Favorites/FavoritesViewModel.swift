@@ -48,8 +48,8 @@ final class FavoritesViewModel {
 
     // MARK: Helper
 
-    func toggleFavorite(_ imageId: String) async {
-        try? await contentViewModel.toggleFavorite(imageId)
+    func toggleFavorite(_ breedId: String) async {
+        try? await contentViewModel.toggleFavorite(breedId)
     }
 
     private func updateBreedFavoriteStatus() {

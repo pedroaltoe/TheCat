@@ -133,8 +133,8 @@ final class BreedsViewModel {
 
     // MARK: Helper
 
-    func toggleFavorite(_ imageId: String) async {
-        try? await contentViewModel.toggleFavorite(imageId)
+    func toggleFavorite(_ breedId: String) async {
+        try? await contentViewModel.toggleFavorite(breedId)
     }
 
     func isBreedFavorite(_ breedId: String) -> Bool {
