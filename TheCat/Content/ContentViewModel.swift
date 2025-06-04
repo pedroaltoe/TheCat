@@ -65,8 +65,7 @@ final class ContentViewModel {
         return favoriteImageIds.contains(imageId)
     }
 
-    func toggleFavorite(_ imageId: String?) async throws {
-        guard let imageId else { return }
+    func toggleFavorite(_ imageId: String) async throws {
         let favoritePost = FavoritePost(imageId: imageId)
 
         if isFavorite(imageId) {

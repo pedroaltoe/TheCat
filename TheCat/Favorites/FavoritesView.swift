@@ -59,7 +59,7 @@ struct FavoritesView: View {
                     .accessibilityLabel(A11y.Favorites.image)
                     .accessibilityIdentifier("Cat favorite image")
 
-                favouriteButton(breed)
+                favouriteButton(breed.id)
             }
 
             Text(breed.lifeSpan)
@@ -102,10 +102,10 @@ struct FavoritesView: View {
         )
     }
 
-    @ViewBuilder func favouriteButton(_ breed: BreedDisplayModel) -> some View {
+    @ViewBuilder func favouriteButton(_ imageId: String) -> some View {
         Button {
             Task {
-                await viewModel.toggleFavorite(breed)
+                await viewModel.toggleFavorite(imageId)
             }
         } label: {
             Image(systemName: Constants.Image.favorite)

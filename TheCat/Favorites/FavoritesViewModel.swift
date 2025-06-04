@@ -32,11 +32,7 @@ final class FavoritesViewModel {
 
     // MARK: Helper
 
-    func toggleFavorite(_ breed: BreedDisplayModel) async {
-        do {
-            try await contentViewModel.toggleFavorite(breed.id)
-        } catch {
-            print("Failed to toggle favorite")
-        }
+    func toggleFavorite(_ imageId: String) async {
+        try? await contentViewModel.toggleFavorite(imageId)
     }
 }
