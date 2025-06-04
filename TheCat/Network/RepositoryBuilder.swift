@@ -11,6 +11,8 @@ struct RepositoryBuilder {
             try await api.searchBreeds(query)
         } postFavorite: { favorite in
             try await api.postFavorite(favorite)
+        } removeFavorite: { imageId in
+            try await api.removeFavorite(imageId)
         }
     }
 }

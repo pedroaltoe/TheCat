@@ -8,6 +8,7 @@ protocol APIClientProtocol {
     func fetchFavorites()  async throws -> [Favorite]
     func searchBreeds(_ query: String) async throws -> [Breed]
     func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse
+    func removeFavorite(_ imageId: Int)  async throws -> FavoriteResponse
 }
 
 enum APIEndpoint {
@@ -16,7 +17,8 @@ enum APIEndpoint {
     case getBreeds(page: Int)
     case getFavorites
     case searchBreeds(query: String)
-    case postFavorite(imageId: String)
+    case postFavorite
+    case removeFavorite(imageId: Int)
 
     var url: String {
         switch self {
@@ -24,12 +26,14 @@ enum APIEndpoint {
         case .getFavorites: return "\(Self.baseURL)/favourites"
         case let .searchBreeds(query): return "\(Self.baseURL)/breeds/search?q=\(query)"
         case .postFavorite: return "\(Self.baseURL)/favourites"
+        case let .removeFavorite(imageId): return "\(Self.baseURL)/favourites/\(imageId)"
         }
     }
 }
 
 enum HttpMethod: String {
     case post = "POST"
+    case delete = "DELETE"
 }
 
 final class APIClient: APIClientProtocol {
@@ -87,7 +91,7 @@ final class APIClient: APIClientProtocol {
     // MARK: POST
 
     func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse {
-        guard let url = URL(string: APIEndpoint.postFavorite(imageId: "").url) else {
+        guard let url = URL(string: APIEndpoint.postFavorite.url) else {
             throw URLError(.badURL)
         }
 
@@ -99,6 +103,35 @@ final class APIClient: APIClientProtocol {
         encoder.keyEncodingStrategy = .convertToSnakeCase
         let jsonData = try encoder.encode(favoritePost)
         request.httpBody = jsonData
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard
+            let response = response as? HTTPURLResponse,
+            response.statusCode == 200 else
+        {
+            throw URLError(.badServerResponse)
+        }
+
+        do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            return try decoder.decode(FavoriteResponse.self, from: data)
+        } catch {
+            throw URLError(.cannotDecodeRawData)
+        }
+    }
+
+    // MARK: DELETE
+
+    func removeFavorite(_ imageId: Int)  async throws -> FavoriteResponse {
+        guard let url = URL(string: APIEndpoint.removeFavorite(imageId: imageId).url) else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = HttpMethod.delete.rawValue
+        request.allHTTPHeaderFields = setupHeaders()
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
@@ -168,6 +201,14 @@ struct APIClientMock: APIClientProtocol {
     }
 
     func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse {
+        if shouldReturnError {
+            throw MockError.failure
+        }
+
+        return FavoriteResponse.mockSuccessResponse
+    }
+
+    func removeFavorite(_ imageId: Int) async throws -> FavoriteResponse {
         if shouldReturnError {
             throw MockError.failure
         }
