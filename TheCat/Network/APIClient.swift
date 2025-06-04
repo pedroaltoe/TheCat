@@ -8,7 +8,7 @@ protocol APIClientProtocol {
     func fetchFavorites()  async throws -> [Favorite]
     func searchBreeds(_ query: String) async throws -> [Breed]
     func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse
-    func removeFavorite(_ imageId: Int)  async throws -> FavoriteResponse
+    func removeFavorite(_ imageId: Int)  async throws -> Void
 }
 
 enum APIEndpoint {
@@ -124,7 +124,7 @@ final class APIClient: APIClientProtocol {
 
     // MARK: DELETE
 
-    func removeFavorite(_ imageId: Int)  async throws -> FavoriteResponse {
+    func removeFavorite(_ imageId: Int)  async throws -> Void {
         guard let url = URL(string: APIEndpoint.removeFavorite(imageId: imageId).url) else {
             throw URLError(.badURL)
         }
@@ -140,14 +140,6 @@ final class APIClient: APIClientProtocol {
             response.statusCode == 200 else
         {
             throw URLError(.badServerResponse)
-        }
-
-        do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            return try decoder.decode(FavoriteResponse.self, from: data)
-        } catch {
-            throw URLError(.cannotDecodeRawData)
         }
     }
 
@@ -208,12 +200,10 @@ struct APIClientMock: APIClientProtocol {
         return FavoriteResponse.mockSuccessResponse
     }
 
-    func removeFavorite(_ imageId: Int) async throws -> FavoriteResponse {
+    func removeFavorite(_ imageId: Int) async throws -> Void {
         if shouldReturnError {
             throw MockError.failure
         }
-
-        return FavoriteResponse.mockSuccessResponse
     }
 }
 #endif

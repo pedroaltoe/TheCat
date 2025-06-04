@@ -8,7 +8,7 @@ protocol RepositoryProtocol {
     var fetchFavorites: () async throws -> [Favorite] { get }
     var searchBreeds: (_ query: String) async throws -> [Breed] { get }
     var postFavorite: (_ favoritePost: FavoritePost) async throws -> FavoriteResponse { get }
-    var removeFavorite: (_ imageId: Int) async throws -> FavoriteResponse { get }
+    var removeFavorite: (_ imageId: Int) async throws -> Void { get }
 }
 
 enum RepositoryError: Error {
@@ -20,14 +20,14 @@ struct Repository: RepositoryProtocol {
     var fetchFavorites: () async throws -> [Favorite]
     var searchBreeds: (_ query: String) async throws -> [Breed]
     var postFavorite: (_ favoritePost: FavoritePost) async throws -> FavoriteResponse
-    var removeFavorite: (_ imageId: Int) async throws -> FavoriteResponse
+    var removeFavorite: (_ imageId: Int) async throws -> Void
 
     init(
         fetchBreeds: @escaping (_ page: Int) async throws -> [Breed],
         fetchFavorites: @escaping () async throws -> [Favorite],
         searchBreeds: @escaping (_ query: String) async throws -> [Breed],
         postFavorite: @escaping (_ favoritePost: FavoritePost) async throws -> FavoriteResponse,
-        removeFavorite: @escaping (_ imageId: Int) async throws -> FavoriteResponse
+        removeFavorite: @escaping (_ imageId: Int) async throws -> Void
     ) {
         self.fetchBreeds = fetchBreeds
         self.fetchFavorites = fetchFavorites
@@ -59,7 +59,7 @@ struct RepositoryMock: RepositoryProtocol {
         return mockPostFavorite(_:)
     }
 
-    var removeFavorite: (Int) async throws -> FavoriteResponse {
+    var removeFavorite: (Int) async throws -> Void {
         return mockRemoveFavorite(_:)
     }
 
@@ -97,12 +97,10 @@ struct RepositoryMock: RepositoryProtocol {
         return FavoriteResponse.mockSuccessResponse
     }
 
-    private func mockRemoveFavorite(_ imageId: Int) async throws -> FavoriteResponse {
+    private func mockRemoveFavorite(_ imageId: Int) async throws -> Void {
         if shouldReturnError {
             throw MockError.failure
         }
-
-        return FavoriteResponse.mockSuccessResponse
     }
 }
 #endif

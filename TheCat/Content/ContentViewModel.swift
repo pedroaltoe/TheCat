@@ -65,8 +65,7 @@ final class ContentViewModel {
 
         if isFavorite(imageId: imageId) {
             if let favorite = allFavorites.first(where: { $0.imageId == imageId }) {
-                let response = try? await repository.removeFavorite(favorite.id)
-                print("----- Removed with: \(String(describing: response)) -----")
+                try? await repository.removeFavorite(favorite.id)
             }
 
             favoriteBreeds.removeAll { $0.referenceImageId == imageId }
