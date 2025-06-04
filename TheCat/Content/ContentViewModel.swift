@@ -17,6 +17,7 @@ final class ContentViewModel {
     var filteredBreeds: [Breed] = []
     var favoriteImageIds: Set<String> = []
     var favoriteBreeds: [Breed] = []
+    var allFavorites: [Favorite] = []
 
     // MARK: Init
 
@@ -41,8 +42,8 @@ final class ContentViewModel {
     }
 
     func fetchFavorites() async throws {
-        let favorites = try await repository.fetchFavorites()
-        favoriteImageIds = Set(favorites.compactMap { $0.imageId })
+        allFavorites = try await repository.fetchFavorites()
+        favoriteImageIds = Set(allFavorites.compactMap { $0.imageId })
         favoriteBreeds = filterFavoriteBreeds()
         favoritesChangedSubject.send(())
     }
@@ -63,12 +64,17 @@ final class ContentViewModel {
         let favoritePost = FavoritePost(imageId: imageId)
 
         if isFavorite(imageId: imageId) {
-//            try await api.unfavorite(imageId)
+            if let favorite = allFavorites.first(where: { $0.imageId == imageId }) {
+                let response = try? await repository.removeFavorite(favorite.id)
+                print("----- Removed with: \(String(describing: response)) -----")
+            }
+
+            favoriteBreeds.removeAll { $0.referenceImageId == imageId }
             favoriteImageIds.remove(imageId)
         } else {
             // TODO: Handle error
             let response = try? await repository.postFavorite(favoritePost)
-            print("----- \(String(describing: response)) -----")
+            print("----- Added with: \(String(describing: response)) -----")
             favoriteImageIds.insert(imageId)
         }
 

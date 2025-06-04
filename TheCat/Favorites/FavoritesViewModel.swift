@@ -11,9 +11,6 @@ final class FavoritesViewModel {
 
     private var cancellables = Set<AnyCancellable>()
 
-    var isLoading = false
-    var favoriteBreeds: [Breed] = []
-
     // MARK: Init
 
     init(contentViewModel: ContentViewModel) {
@@ -53,7 +50,6 @@ final class FavoritesViewModel {
     }
 
     private func updateBreedFavoriteStatus() {
-        guard case .present(let favoriteBreeds) = viewState else { return }
-        viewState = .present(favoriteBreeds)
+        viewState = .present(contentViewModel.favoriteBreeds)
     }
 }
