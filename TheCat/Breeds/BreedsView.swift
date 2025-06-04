@@ -88,7 +88,7 @@ struct BreedsView: View {
                     .accessibilityLabel(A11y.Breeds.image)
                     .accessibilityIdentifier("Cat breed image")
 
-                breed.isFavorite == true
+                viewModel.isBreedFavorite(breed.id)
                 ? favoriteButton(breed, Constants.Image.favorite)
                 : favoriteButton(breed, Constants.Image.notFavorite)
             }

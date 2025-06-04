@@ -5,5 +5,4 @@ struct BreedDisplayModel: Identifiable {
     let name: String
     let imageUrl: String?
     let lifeSpan: String
-    let isFavorite: Bool
 }

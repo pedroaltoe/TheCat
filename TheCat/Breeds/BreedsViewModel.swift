@@ -106,4 +106,8 @@ final class BreedsViewModel {
     func toggleFavorite(_ imageId: String) async {
         try? await contentViewModel.toggleFavorite(imageId)
     }
+
+    func isBreedFavorite(_ breedId: String) -> Bool {
+        return contentViewModel.isFavorite(breedId)
+    }
 }

@@ -50,8 +50,7 @@ final class ContentViewModel {
                 id: $0.referenceImageId ?? "\($0.id)",
                 name: $0.name,
                 imageUrl: $0.image?.url,
-                lifeSpan: $0.lifeSpan,
-                isFavorite: isFavorite($0.referenceImageId)
+                lifeSpan: $0.lifeSpan
             )
         }
     }
