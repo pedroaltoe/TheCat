@@ -39,11 +39,9 @@ class Coordinator {
         switch screen {
         case .breedsView:
             BreedsView(viewModel: BreedsViewModel(contentViewModel: contentViewModel))
-                .environment(contentViewModel)
                 .navigationTitle("Breeds list")
         case .favoritesView:
             FavoritesView(viewModel: FavoritesViewModel(contentViewModel: contentViewModel))
-                .environment(contentViewModel)
                 .navigationTitle("Favorite list")
         case let .detailsView(breed):
             BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
