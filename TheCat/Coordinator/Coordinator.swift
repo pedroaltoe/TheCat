@@ -9,12 +9,13 @@ class Coordinator {
     enum Route: Hashable {
         case breedsView
         case favoritesView
-        case detailsView(Breed)
     }
 
     let contentViewModel: ContentViewModel
 
     var path = NavigationPath()
+
+    var presentedBreedDetails: Breed?
 
     init() {
         let api = APIClient()
@@ -25,14 +26,29 @@ class Coordinator {
     // MARK: Navigation
 
     func navigate(to route: Route) {
-        path.append(route)
+        switch route {
+        case .breedsView:
+            path.append(route)
+        case .favoritesView:
+            path.append(route)
+        }
     }
 
     func goBack() {
-        path = NavigationPath()
+        if presentedBreedDetails != nil {
+            presentedBreedDetails = nil
+        } else if !path.isEmpty {
+            path.removeLast()
+        } else {
+            path = NavigationPath()
+        }
     }
 
-    // MARK: Screen builder
+    func dismissModal() {
+        presentedBreedDetails = nil
+    }
+
+    // MARK: Main screen builder
 
     @ViewBuilder
     func build(screen: Route) -> some View {
@@ -43,9 +59,13 @@ class Coordinator {
         case .favoritesView:
             FavoritesView(viewModel: FavoritesViewModel(contentViewModel: contentViewModel))
                 .navigationTitle(Localized.Favorites.title)
-        case let .detailsView(breed):
-            BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
         }
+    }
+
+    // MARK: Detail screen builder
+    @ViewBuilder
+    func buildBreedDetailsView(breed: Breed) -> some View {
+        BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
     }
 }
 
