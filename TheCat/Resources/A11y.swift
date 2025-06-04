@@ -1,5 +1,7 @@
 enum A11y {
     enum Breeds {
+        static let emptyList = "Cat breed empty list"
+        static let emptyTitle = "Breeds list is empty"
         static let favorite = "Cat breed favorite"
         static let image = "Cat breed image"
         static let list = "Cat breed list"

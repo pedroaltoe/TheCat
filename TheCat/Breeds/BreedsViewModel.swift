@@ -9,7 +9,9 @@ final class BreedsViewModel {
     
     var searchText = "" {
         didSet {
-            filterBreeds(searchText)
+            Task {
+                await searchBreeds(searchText)
+            }
         }
     }
 
@@ -80,16 +82,23 @@ final class BreedsViewModel {
 
     // MARK: Search
 
-    private func filterBreeds(_ text: String) {
-        if text.isEmpty {
-            filteredBreeds = breeds
-        } else {
-            filteredBreeds = breeds.filter {
-                $0.name.localizedStandardContains(text)
+    func searchBreeds(_ query: String) async {
+        do {
+            guard !query.isEmpty else {
+                self.filteredBreeds = self.breeds
+                viewState = .present(self.filteredBreeds)
+                return
             }
-        }
 
-        viewState = .present(breeds)
+            page = 0
+            isLoadingMore = false
+
+            let filteredBreeds = try await contentViewModel.searchBreeds(query)
+            self.filteredBreeds = filteredBreeds
+            viewState = .present(self.filteredBreeds)
+        } catch {
+            viewState = .error(error.localizedDescription)
+        }
     }
 
     // MARK: Helper

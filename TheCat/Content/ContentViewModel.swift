@@ -8,6 +8,7 @@ final class ContentViewModel {
     private let repository: RepositoryProtocol
 
     var allBreeds: [BreedDisplayModel] = []
+    var filteredBreeds: [BreedDisplayModel] = []
     var favoriteImageIds: Set<String> = []
 
     // MARK: Init
@@ -22,6 +23,13 @@ final class ContentViewModel {
         let breeds = try await repository.fetchBreeds(page)
         let displayModel = makeDisplayModel(from: breeds)
         allBreeds.append(contentsOf: displayModel)
+        return displayModel
+    }
+
+    func searchBreeds(_ query: String) async throws -> [BreedDisplayModel] {
+        let breeds = try await repository.searchBreeds(query)
+        let displayModel = makeDisplayModel(from: breeds)
+        filteredBreeds.append(contentsOf: displayModel)
         return displayModel
     }
 

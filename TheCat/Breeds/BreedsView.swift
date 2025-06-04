@@ -55,15 +55,25 @@ struct BreedsView: View {
 
     @ViewBuilder func contentView(_ breeds: [BreedDisplayModel]) -> some View {
         ScrollView {
-            LazyVGrid(columns: columns, spacing: Space.large) {
-                ForEach(breeds) { breed in
-                    item(breed)
-                        .tint(.primary)
+            if breeds.isEmpty {
+                ContentUnavailableView(
+                    A11y.Breeds.emptyTitle,
+                    systemImage: Constants.Image.placeHolder
+                )
+                .padding()
+                .accessibilityLabel(A11y.Breeds.emptyList)
+                .accessibilityIdentifier("Cat breed empty list")
+            } else {
+                LazyVGrid(columns: columns, spacing: Space.large) {
+                    ForEach(breeds) { breed in
+                        item(breed)
+                            .tint(.primary)
+                    }
                 }
+                .padding()
+                .accessibilityLabel(A11y.Breeds.list)
+                .accessibilityIdentifier("Cat breed list")
             }
-            .padding()
-            .accessibilityLabel(A11y.Breeds.list)
-            .accessibilityIdentifier("Cat breed list")
         }
         .searchable(
             text: $viewModel.searchText,
