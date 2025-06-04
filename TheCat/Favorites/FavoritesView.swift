@@ -18,7 +18,10 @@ struct FavoritesView: View {
                     viewModel.onAppear()
                 }
         case .empty:
-            ContentUnavailableView(A11y.Favorites.emptyTitle, systemImage: A11y.Favorites.emptyImage)
+            ContentUnavailableView(
+                A11y.Favorites.emptyTitle,
+                systemImage: Constants.Image.emptyFavoritesImage
+            )
         case let .present(breeds):
             contentView(breeds)
         }
