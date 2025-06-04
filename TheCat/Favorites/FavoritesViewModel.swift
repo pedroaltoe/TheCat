@@ -8,14 +8,19 @@ final class FavoritesViewModel {
 
     private(set) var viewState: FavoritesViewState
     private let contentViewModel: ContentViewModel
+    private let coordinator: Coordinator
 
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: Init
 
-    init(contentViewModel: ContentViewModel) {
+    init(
+        contentViewModel: ContentViewModel,
+        coordinator: Coordinator
+    ) {
         viewState = .initial
         self.contentViewModel = contentViewModel
+        self.coordinator = coordinator
 
         setupFavouriteObserver()
     }
@@ -41,6 +46,12 @@ final class FavoritesViewModel {
         } else {
             viewState = .present(favorites)
         }
+    }
+
+    // MARK: Navigation
+
+    func navigateToDetail(for breed: Breed) {
+        coordinator.presentedBreedDetails = breed
     }
 
     // MARK: Helper

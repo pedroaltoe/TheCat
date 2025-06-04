@@ -70,6 +70,9 @@ struct BreedsView: View {
                     ForEach(breeds) { breed in
                         item(breed)
                             .tint(.primary)
+                            .onTapGesture {
+                                viewModel.navigateToDetail(for: breed)
+                            }
                     }
                 }
                 .padding()
@@ -160,6 +163,11 @@ struct BreedsView: View {
 #if targetEnvironment(simulator)
 #Preview {
     let contentViewModel = ContentViewModel(repository: RepositoryBuilder.makeRepository(api: APIClientMock()))
-    BreedsView(viewModel: BreedsViewModel(contentViewModel: contentViewModel))
+    BreedsView(
+        viewModel: BreedsViewModel(
+            contentViewModel: contentViewModel,
+            coordinator: MockCoordinator()
+        )
+    )
 }
 #endif

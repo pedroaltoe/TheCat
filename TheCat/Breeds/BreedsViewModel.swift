@@ -25,12 +25,17 @@ final class BreedsViewModel {
     private var page = 0
 
     private let contentViewModel: ContentViewModel
+    private let coordinator: Coordinator
 
     // MARK: Init
 
-    init(contentViewModel: ContentViewModel) {
+    init(
+        contentViewModel: ContentViewModel,
+        coordinator: Coordinator
+    ) {
         viewState = .initial
         self.contentViewModel = contentViewModel
+        self.coordinator = coordinator
 
         setupFavouriteObserver()
         setupDebouncedSearch()
@@ -129,6 +134,12 @@ final class BreedsViewModel {
                 viewState = .error(error.localizedDescription)
             }
         }
+    }
+
+    // MARK: Navigation
+
+    func navigateToDetail(for breed: Breed) {
+        coordinator.presentedBreedDetails = breed
     }
 
     // MARK: Helper
