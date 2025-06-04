@@ -15,7 +15,7 @@ struct FavoritesView: View {
         case .initial:
             progressView
                 .onAppear {
-                    viewModel.onAppear()
+                    viewModel.checkFavorites()
                 }
         case .empty:
             ContentUnavailableView(
@@ -25,7 +25,7 @@ struct FavoritesView: View {
         case let .present(breeds):
             contentView(breeds)
                 .onAppear {
-                    viewModel.onAppear()
+                    viewModel.checkFavorites()
                 }
         }
     }

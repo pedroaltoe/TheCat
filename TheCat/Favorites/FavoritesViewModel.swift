@@ -20,7 +20,7 @@ final class FavoritesViewModel {
 
     // MARK: Fetch data
 
-    func onAppear() {
+    func checkFavorites() {
         let favorites = contentViewModel.favoriteBreeds
 
         if favorites.isEmpty {
