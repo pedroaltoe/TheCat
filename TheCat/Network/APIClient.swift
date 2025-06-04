@@ -6,6 +6,7 @@ import Foundation
 protocol APIClientProtocol {
     func fetchBreeds(_ page: Int) async throws -> [Breed]
     func fetchFavorites()  async throws -> [Favorite]
+    func searchBreeds(_ query: String) async throws -> [Breed]
     func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse
 }
 
@@ -14,12 +15,14 @@ enum APIEndpoint {
 
     case getBreeds(page: Int)
     case getFavorites
+    case searchBreeds(query: String)
     case postFavorite(imageId: String)
 
     var url: String {
         switch self {
         case let .getBreeds(page): return "\(Self.baseURL)/breeds?limit=15&page=\(page)"
         case .getFavorites: return "\(Self.baseURL)/favourites"
+        case let .searchBreeds(query): return "\(Self.baseURL)/breeds/search?q=\(query)"
         case .postFavorite: return "\(Self.baseURL)/favourites"
         }
     }
@@ -41,6 +44,10 @@ final class APIClient: APIClientProtocol {
         return try await fetch(.getFavorites)
     }
 
+    func searchBreeds(_ query: String) async throws -> [Breed] {
+        return try await fetch(.searchBreeds(query: query))
+    }
+
     private func fetch<T: Decodable>(_ endpoint: APIEndpoint) async throws -> [T] {
         var url = URL(string: "")
         switch endpoint {
@@ -48,6 +55,8 @@ final class APIClient: APIClientProtocol {
             url = URL(string: APIEndpoint.getBreeds(page: page).url)
         case .getFavorites:
             url = URL(string: APIEndpoint.getFavorites.url)
+        case let .searchBreeds(query):
+            url = URL(string: APIEndpoint.searchBreeds(query: query).url)
         default: break
         }
 
@@ -148,6 +157,14 @@ struct APIClientMock: APIClientProtocol {
         }
 
         return Favorite.mockFavorites
+    }
+
+    func searchBreeds(_ query: String) async throws -> [Breed] {
+        if shouldReturnError {
+            throw MockError.failure
+        }
+
+        return Breed.mockBreeds
     }
 
     func postFavorite(_ favoritePost: FavoritePost)  async throws -> FavoriteResponse {
