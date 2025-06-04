@@ -8,7 +8,6 @@ struct Favorite: Codable, Identifiable {
     let id: Int
     let userId: String
     let imageId: String
-    let subId: String?
     let createdAt: String
     let image: FavoriteImage?
 }
@@ -30,7 +29,6 @@ extension Favorite {
             id: UUID().hashValue,
             userId: "user1",
             imageId: "image1",
-            subId: "1234",
             createdAt: "",
             image: FavoriteImage(
                 id: "image1",
@@ -41,7 +39,6 @@ extension Favorite {
             id: UUID().hashValue,
             userId: "user1",
             imageId: "image2",
-            subId: "1234",
             createdAt: "",
             image: FavoriteImage(
                 id: "image2",
@@ -52,7 +49,6 @@ extension Favorite {
             id: UUID().hashValue,
             userId: "user1",
             imageId: "image3",
-            subId: "1234",
             createdAt: "",
             image: FavoriteImage(
                 id: "image3",
