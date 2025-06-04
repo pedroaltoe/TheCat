@@ -62,10 +62,17 @@ struct FavoritesView: View {
                 favouriteButton(imageId: breed.referenceImageId)
             }
 
-            Text(breed.lifeSpan)
-                .font(.system(size: 12))
-                .accessibilityLabel(A11y.Favorites.lifeSpan(breed.lifeSpan))
-                .accessibilityIdentifier("Cat favorite lifeSpan")
+            VStack {
+                Text(breed.name)
+                    .font(.system(size: 12))
+                    .accessibilityLabel(A11y.Breeds.name(breed.name))
+                    .accessibilityIdentifier("Cat breed name")
+
+                Text(A11y.Favorites.lifeSpan(breed.lifeSpan))
+                    .font(.system(size: 12))
+                    .accessibilityLabel(A11y.Favorites.lifeSpan(breed.lifeSpan))
+                    .accessibilityIdentifier("Cat favorite lifeSpan")
+            }
         }
     }
 

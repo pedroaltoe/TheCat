@@ -18,7 +18,7 @@ enum A11y {
         static let list = "Cat favorites list"
 
         static func lifeSpan(_ lifeSpan: String) -> String {
-            "Cat breed life span \(lifeSpan)"
+            "Lifespan: \(lifeSpan)"
         }
     }
 
