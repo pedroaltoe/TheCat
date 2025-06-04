@@ -1,3 +1,4 @@
+import Combine
 import Observation
 import SwiftUI
 
@@ -8,6 +9,8 @@ final class FavoritesViewModel {
     private(set) var viewState: FavoritesViewState
     private let contentViewModel: ContentViewModel
 
+    private var cancellables = Set<AnyCancellable>()
+
     var isLoading = false
     var favoriteBreeds: [BreedDisplayModel] = []
 
@@ -16,6 +19,19 @@ final class FavoritesViewModel {
     init(contentViewModel: ContentViewModel) {
         viewState = .initial
         self.contentViewModel = contentViewModel
+
+        setupFavouriteObserver()
+    }
+
+    // MARK: Setup
+
+    private func setupFavouriteObserver() {
+        contentViewModel.favoritesChangedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateBreedFavoriteStatus()
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: Fetch data
@@ -34,5 +50,10 @@ final class FavoritesViewModel {
 
     func toggleFavorite(_ imageId: String) async {
         try? await contentViewModel.toggleFavorite(imageId)
+    }
+
+    private func updateBreedFavoriteStatus() {
+        guard case .present(let favoriteBreeds) = viewState else { return }
+        viewState = .present(favoriteBreeds)
     }
 }
