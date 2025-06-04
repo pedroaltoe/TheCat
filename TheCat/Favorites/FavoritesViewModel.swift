@@ -21,8 +21,7 @@ final class FavoritesViewModel {
     // MARK: Fetch data
 
     func onAppear() {
-        let favorites = contentViewModel.allBreeds.filter { contentViewModel.isFavorite($0.id) }
-        favoriteBreeds = favorites
+        let favorites = contentViewModel.favoriteBreeds
 
         if favorites.isEmpty {
             viewState = .empty

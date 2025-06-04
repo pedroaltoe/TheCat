@@ -24,6 +24,9 @@ struct FavoritesView: View {
             )
         case let .present(breeds):
             contentView(breeds)
+                .onAppear {
+                    viewModel.onAppear()
+                }
         }
     }
 

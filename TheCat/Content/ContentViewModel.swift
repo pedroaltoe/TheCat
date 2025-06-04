@@ -10,6 +10,7 @@ final class ContentViewModel {
     var allBreeds: [BreedDisplayModel] = []
     var filteredBreeds: [BreedDisplayModel] = []
     var favoriteImageIds: Set<String> = []
+    var favoriteBreeds: [BreedDisplayModel] = []
 
     // MARK: Init
 
@@ -20,6 +21,8 @@ final class ContentViewModel {
     // MARK: Fetch data
 
     func fetchBreeds(_ page: Int) async throws -> [BreedDisplayModel] {
+        try? await fetchFavorites()
+        
         let breeds = try await repository.fetchBreeds(page)
         let displayModel = makeDisplayModel(from: breeds)
         allBreeds.append(contentsOf: displayModel)
@@ -36,12 +39,7 @@ final class ContentViewModel {
     func fetchFavorites() async throws {
         let favorites = try await repository.fetchFavorites()
         favoriteImageIds = Set(favorites.compactMap { $0.imageId })
-    }
-
-    func onAppear() {
-        Task {
-            try await fetchFavorites()
-        }
+        favoriteBreeds = filterFavoriteBreeds()
     }
 
     // MARK: Helper
@@ -56,6 +54,10 @@ final class ContentViewModel {
                 isFavorite: isFavorite($0.referenceImageId)
             )
         }
+    }
+
+    func filterFavoriteBreeds() -> [BreedDisplayModel] {
+        allBreeds.filter { isFavorite($0.id) }
     }
 
     func isFavorite(_ imageId: String?) -> Bool {
