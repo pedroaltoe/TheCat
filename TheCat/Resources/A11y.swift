@@ -11,7 +11,6 @@ enum A11y {
     }
 
     enum Favorites {
-        static let emptyImage = "star.slash"
         static let emptyTitle = "Favorites list is empty"
         static let image = "Cat favorite image"
         static let list = "Cat favorites list"

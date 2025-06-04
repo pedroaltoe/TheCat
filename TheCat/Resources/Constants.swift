@@ -16,6 +16,7 @@ enum Constants {
         }
 
         static let catsList = "square.grid.3x3.fill"
+        static let emptyFavoritesImage = "star.slash"
         static let fail = "photo.badge.exclamationmark"
         static let favorite = "star.fill"
         static let favorites = "square.grid.3x3.fill"
