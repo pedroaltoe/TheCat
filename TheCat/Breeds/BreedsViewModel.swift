@@ -1,3 +1,4 @@
+import Combine
 import Observation
 import SwiftUI
 
@@ -9,11 +10,13 @@ final class BreedsViewModel {
     
     var searchText = "" {
         didSet {
-            Task {
-                await searchBreeds(searchText)
-            }
+            debouncedSearchTextSubject.send(searchText)
         }
     }
+
+    private var cancellables = Set<AnyCancellable>()
+    private let debouncedSearchTextSubject = PassthroughSubject<String, Never>()
+    private var currentTask: Task<Void, Never>?
 
     var isLoadingMore = false
 
@@ -28,6 +31,30 @@ final class BreedsViewModel {
     init(contentViewModel: ContentViewModel) {
         viewState = .initial
         self.contentViewModel = contentViewModel
+
+        setupFavouriteObserver()
+        setupDebouncedSearch()
+    }
+
+    // MARK: Setup
+
+    private func setupFavouriteObserver() {
+        contentViewModel.favoritesChangedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateBreedFavoriteStatus()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setupDebouncedSearch() {
+        debouncedSearchTextSubject
+            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] searchText in
+                self?.searchBreeds(searchText)
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: Fetch data
@@ -82,22 +109,25 @@ final class BreedsViewModel {
 
     // MARK: Search
 
-    func searchBreeds(_ query: String) async {
-        do {
-            guard !query.isEmpty else {
-                self.filteredBreeds = self.breeds
+    func searchBreeds(_ query: String) {
+        currentTask?.cancel()
+        currentTask = Task {
+            do {
+                guard !query.isEmpty else {
+                    self.filteredBreeds = self.breeds
+                    viewState = .present(self.filteredBreeds)
+                    return
+                }
+
+                page = 0
+                isLoadingMore = false
+
+                let filteredBreeds = try await contentViewModel.searchBreeds(query)
+                self.filteredBreeds = filteredBreeds
                 viewState = .present(self.filteredBreeds)
-                return
+            } catch {
+                viewState = .error(error.localizedDescription)
             }
-
-            page = 0
-            isLoadingMore = false
-
-            let filteredBreeds = try await contentViewModel.searchBreeds(query)
-            self.filteredBreeds = filteredBreeds
-            viewState = .present(self.filteredBreeds)
-        } catch {
-            viewState = .error(error.localizedDescription)
         }
     }
 
@@ -109,5 +139,10 @@ final class BreedsViewModel {
 
     func isBreedFavorite(_ breedId: String) -> Bool {
         return contentViewModel.isFavorite(breedId)
+    }
+
+    private func updateBreedFavoriteStatus() {
+        guard case .present(let currentBreeds) = viewState else { return }
+        viewState = .present(currentBreeds)
     }
 }
