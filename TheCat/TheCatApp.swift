@@ -4,7 +4,12 @@ import SwiftUI
 struct TheCatApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(
+                coordinator: Coordinator(),
+                contentViewModel: ContentViewModel(
+                    repository: RepositoryBuilder.makeRepository(api: APIClient())
+                )
+            )
         }
     }
 }

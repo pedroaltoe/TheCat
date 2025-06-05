@@ -2,26 +2,42 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @State private var selectedTab: Tab = .breeds
-    @Bindable private var coordinator = Coordinator()
-
-    let contentViewModel = ContentViewModel(repository: RepositoryBuilder.makeRepository(api: APIClient()))
-
     enum Tab {
         case breeds
         case favorites
     }
 
+    @State private var selectedTab: Tab
+    @Bindable private var coordinator: Coordinator
+
+    let contentViewModel: ContentViewModel
+    let breedsViewModel: BreedsViewModel
+    let favoritesViewModel: FavoritesViewModel
+
+    init(
+        coordinator: Coordinator,
+        contentViewModel: ContentViewModel
+    ) {
+        selectedTab = .breeds
+        self.coordinator = coordinator
+        self.contentViewModel = contentViewModel
+
+        breedsViewModel = BreedsViewModel(
+            contentViewModel: contentViewModel,
+            coordinator: coordinator
+        )
+
+        favoritesViewModel = FavoritesViewModel(
+            contentViewModel: contentViewModel,
+            coordinator: coordinator
+        )
+    }
+
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                BreedsView(
-                    viewModel: BreedsViewModel(
-                        contentViewModel: contentViewModel,
-                        coordinator: coordinator
-                    )
-                )
-                .navigationTitle(Localized.Breeds.title)
+                BreedsView(viewModel: breedsViewModel)
+                    .navigationTitle(Localized.Breeds.title)
             }
             .tabItem {
                 Label(Localized.Breeds.catsListButton, systemImage: Constants.Image.catsList)
@@ -29,13 +45,8 @@ struct ContentView: View {
             .tag(Tab.breeds)
 
             NavigationStack {
-                FavoritesView(
-                    viewModel: FavoritesViewModel(
-                        contentViewModel: contentViewModel,
-                        coordinator: coordinator
-                    )
-                )
-                .navigationTitle(Localized.Favorites.title)
+                FavoritesView(viewModel: favoritesViewModel)
+                    .navigationTitle(Localized.Favorites.title)
             }
             .tabItem {
                 Label(Localized.Breeds.favouritesButton, systemImage: Constants.Image.favorites)
@@ -60,6 +71,11 @@ struct ContentView: View {
 
 #if targetEnvironment(simulator)
 #Preview {
-    ContentView()
+    let coordinator = MockCoordinator()
+    let contentViewModel = ContentViewModel(repository: RepositoryBuilder.makeRepository(api: APIClientMock()))
+    ContentView(
+        coordinator: coordinator,
+        contentViewModel: contentViewModel
+    )
 }
 #endif
