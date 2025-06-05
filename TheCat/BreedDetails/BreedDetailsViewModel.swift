@@ -5,7 +5,8 @@ import SwiftUI
 @Observable
 final class BreedDetailsViewModel {
 
-    let breed: Breed
+    private(set) var viewState: BreedDetailsViewState
+
     let contentViewModel: ContentViewModel
 
     // MARK: Init
@@ -14,8 +15,10 @@ final class BreedDetailsViewModel {
         breed: Breed,
         contentViewModel: ContentViewModel
     ) {
-        self.breed = breed
+        viewState = .initial
         self.contentViewModel = contentViewModel
+
+        viewState = .present(breed)
     }
 
     // MARK: Helper

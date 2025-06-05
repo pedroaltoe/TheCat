@@ -5,40 +5,58 @@ struct BreedDetailsView: View {
     @Bindable var viewModel: BreedDetailsViewModel
 
     var body: some View {
+        switch viewModel.viewState {
+        case .initial:
+            progressView
+        case let .present(breed):
+            contentView(breed)
+        }
+    }
+
+    // MARK: Progress view
+
+    @ViewBuilder var progressView: some View {
+        ProgressView()
+            .controlSize(.large)
+            .padding()
+    }
+
+    // MARK: Content
+
+    @ViewBuilder func contentView(_ breed: Breed) -> some View {
         ScrollView {
             VStack(spacing: Space.extraExtraLarge) {
                 HStack {
                     Spacer()
 
-                    viewModel.isBreedFavorite(imageId: viewModel.breed.referenceImageId)
-                    ? favoriteButton(viewModel.breed, Constants.Image.favorite)
-                    : favoriteButton(viewModel.breed, Constants.Image.notFavorite)
+                    viewModel.isBreedFavorite(imageId: breed.referenceImageId)
+                    ? favoriteButton(breed, Constants.Image.favorite)
+                    : favoriteButton(breed, Constants.Image.notFavorite)
                 }
 
-                image
+                breedImage(breed)
                     .accessibilityLabel(A11y.Details.image)
                     .accessibilityIdentifier("Image")
 
                 VStack(alignment: .leading, spacing: Space.medium) {
-                    Text("\(Localized.Details.origin): \(viewModel.breed.origin)")
+                    Text("\(Localized.Details.origin): \(breed.origin)")
                         .font(.subheadline)
-                        .accessibilityLabel(A11y.Details.origin(viewModel.breed.origin))
+                        .accessibilityLabel(A11y.Details.origin(breed.origin))
                         .accessibilityIdentifier("Origin")
 
-                    Text("\(Localized.Details.temperament): \(viewModel.breed.temperament)")
+                    Text("\(Localized.Details.temperament): \(breed.temperament)")
                         .font(.subheadline)
-                        .accessibilityLabel(A11y.Details.temperament(viewModel.breed.temperament))
+                        .accessibilityLabel(A11y.Details.temperament(breed.temperament))
                         .accessibilityIdentifier("Temperament")
 
-                    Text("\(Localized.Details.description): \(viewModel.breed.description)")
+                    Text("\(Localized.Details.description): \(breed.description)")
                         .font(.body)
                         .lineLimit(nil)
-                        .accessibilityLabel(A11y.Details.description(viewModel.breed.description))
+                        .accessibilityLabel(A11y.Details.description(breed.description))
                         .accessibilityIdentifier("Description")
                 }
             }
         }
-        .navigationTitle(viewModel.breed.name)
         .padding(.horizontal, Space.large)
     }
 
@@ -60,8 +78,8 @@ struct BreedDetailsView: View {
 
     // MARK: Image
 
-    @ViewBuilder var image: some View {
-        AsyncImage(url: URL(string: viewModel.breed.image?.url ?? "")) { phase in
+    @ViewBuilder func breedImage(_ breed: Breed) -> some View {
+        AsyncImage(url: URL(string: breed.image?.url ?? "")) { phase in
             switch phase {
             case let .success(image):
                 image
