@@ -6,7 +6,7 @@ struct BreedDetailsFeatureView: View {
     let store: StoreOf<BreedDetailsFeature>
 
     var body: some View {
-//        contentView(store.breed)
+        contentView(store.breed)
     }
 
     // MARK: Progress view
@@ -61,7 +61,7 @@ struct BreedDetailsFeatureView: View {
     @ViewBuilder func favoriteButton(_ breed: Breed, _ image: String) -> some View {
         Button {
             Task {
-//                await viewModel.toggleFavorite(imageId: breed.referenceImageId)
+                store.send(.toggleFavorite(breed.referenceImageId))
             }
         } label: {
             Image(systemName: image)
