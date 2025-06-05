@@ -7,6 +7,14 @@ struct BreedDetailsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Space.extraExtraLarge) {
+                HStack {
+                    Spacer()
+
+                    viewModel.isBreedFavorite(imageId: viewModel.breed.referenceImageId)
+                    ? favoriteButton(viewModel.breed, Constants.Image.favorite)
+                    : favoriteButton(viewModel.breed, Constants.Image.notFavorite)
+                }
+
                 image
                     .accessibilityLabel(A11y.Details.image)
                     .accessibilityIdentifier("Image")
@@ -32,19 +40,25 @@ struct BreedDetailsView: View {
         }
         .navigationTitle(viewModel.breed.name)
         .padding(.horizontal, Space.large)
-
-        Spacer()
-
-        Button {
-            print("Add to favourites")
-        } label: {
-            Text(Localized.Details.addToFavouritesButton)
-        }
-        .buttonStyle(.borderedProminent)
-        .font(.body)
-        .accessibilityLabel(A11y.Details.addToFavouritesButton)
-        .accessibilityIdentifier("Add to favourites button")
     }
+
+    // MARK: Favorite button
+
+    @ViewBuilder func favoriteButton(_ breed: Breed, _ image: String) -> some View {
+        Button {
+            Task {
+                await viewModel.toggleFavorite(imageId: breed.referenceImageId)
+            }
+        } label: {
+            Image(systemName: image)
+                .renderingMode(.original)
+                .font(.largeTitle).fontWeight(.bold)
+                .accessibilityLabel(A11y.Breeds.favorite)
+                .accessibilityIdentifier("Cat breed \(image == Constants.Image.notFavorite ? "not " : "")favorite")
+        }
+    }
+
+    // MARK: Image
 
     @ViewBuilder var image: some View {
         AsyncImage(url: URL(string: viewModel.breed.image?.url ?? "")) { phase in
@@ -72,6 +86,12 @@ struct BreedDetailsView: View {
 
 #if targetEnvironment(simulator)
 #Preview {
-    BreedDetailsView(viewModel: BreedDetailsViewModel(breed: Breed.mockBreeds[0]))
+    let contentViewModel = ContentViewModel(repository: RepositoryBuilder.makeRepository(api: APIClientMock()))
+    BreedDetailsView(
+        viewModel: BreedDetailsViewModel(
+            breed: Breed.mockBreeds[0],
+            contentViewModel: contentViewModel
+        )
+    )
 }
 #endif
