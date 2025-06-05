@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct ContentView: View {
@@ -55,11 +56,10 @@ struct ContentView: View {
         }
         .sheet(item: $coordinator.presentedBreedDetails) { breed in
             NavigationStack {
-                BreedDetailsView(
-                    viewModel: BreedDetailsViewModel(
-                        breed: breed,
-                        contentViewModel: contentViewModel
-                    )
+                BreedDetailsFeatureView(
+                    store: Store(initialState: BreedDetailsFeature.State(breed: breed)) {
+                        BreedDetailsFeature(contentViewModel: contentViewModel)
+                    }
                 )
                 .navigationTitle(breed.name)
             }
