@@ -6,14 +6,6 @@ import Observation
 struct BreedDetailsFeature {
 
     let contentViewModel: ContentViewModel
-    let breed: Breed
-
-    // MARK: State
-
-    @ObservableState
-    struct State: Equatable {
-        var isFavorite = false
-    }
 
     // MARK: Action
 
@@ -23,12 +15,21 @@ struct BreedDetailsFeature {
         case isBreedFavoriteResponse(Bool)
     }
 
+    // MARK: State
+
+    @ObservableState
+    struct State: Equatable {
+        let breed: Breed
+        var isFavorite = false
+    }
+
     // MARK: Reducer Body
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case let .toggleFavorite(imageId):
+                state.isFavorite.toggle()
                 return .run { send in
                     try? await self.contentViewModel.toggleFavorite(imageId: imageId)
                 }
