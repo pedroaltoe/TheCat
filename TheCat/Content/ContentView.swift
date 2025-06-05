@@ -43,8 +43,15 @@ struct ContentView: View {
             .tag(Tab.favorites)
         }
         .sheet(item: $coordinator.presentedBreedDetails) { breed in
-            BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
+            NavigationStack {
+                BreedDetailsView(
+                    viewModel: BreedDetailsViewModel(
+                        breed: breed,
+                        contentViewModel: contentViewModel
+                    )
+                )
                 .navigationTitle(breed.name)
+            }
         }
     }
 }
