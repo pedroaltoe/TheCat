@@ -3,7 +3,9 @@ import SwiftUI
 struct ContentView: View {
 
     @State private var selectedTab: Tab = .breeds
-    @State private var coordinator = Coordinator()
+    @Bindable private var coordinator = Coordinator()
+
+    let contentViewModel = ContentViewModel(repository: RepositoryBuilder.makeRepository(api: APIClient()))
 
     enum Tab {
         case breeds
@@ -12,22 +14,28 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack(path: $coordinator.path) {
-                coordinator.build(screen: .breedsView)
-                    .navigationDestination(for: Coordinator.Route.self) { screen in
-                    coordinator.build(screen: screen)
-                }
+            NavigationStack {
+                BreedsView(
+                    viewModel: BreedsViewModel(
+                        contentViewModel: contentViewModel,
+                        coordinator: coordinator
+                    )
+                )
+                .navigationTitle(Localized.Breeds.title)
             }
             .tabItem {
                 Label(Localized.Breeds.catsListButton, systemImage: Constants.Image.catsList)
             }
             .tag(Tab.breeds)
 
-            NavigationStack(path: $coordinator.path) {
-                coordinator.build(screen: .favoritesView)
-                    .navigationDestination(for: Coordinator.Route.self) { screen in
-                        coordinator.build(screen: screen)
-                    }
+            NavigationStack {
+                FavoritesView(
+                    viewModel: FavoritesViewModel(
+                        contentViewModel: contentViewModel,
+                        coordinator: coordinator
+                    )
+                )
+                .navigationTitle(Localized.Favorites.title)
             }
             .tabItem {
                 Label(Localized.Breeds.favouritesButton, systemImage: Constants.Image.favorites)
@@ -35,7 +43,8 @@ struct ContentView: View {
             .tag(Tab.favorites)
         }
         .sheet(item: $coordinator.presentedBreedDetails) { breed in
-            coordinator.buildBreedDetailsView(breed: breed)
+            BreedDetailsView(viewModel: BreedDetailsViewModel(breed: breed))
+                .navigationTitle(breed.name)
         }
     }
 }
